@@ -1,3 +1,6 @@
+from typing import Annotated
+
+from fastapi import Depends, HTTPException, status
 from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import (
     BearerTransport,
@@ -32,4 +35,14 @@ fastapi_users = FastAPIUsers[User, int](
 )
 
 current_active_user = fastapi_users.current_user(active=True)
-current_active_superuser = fastapi_users.current_user(active=True, superuser=True)
+
+
+async def get_current_active_superuser(
+    current_user: Annotated[User, Depends(fastapi_users.current_user(active=True))]
+) -> User:
+    if not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Allowed for admins only.",
+        )
+    return current_user

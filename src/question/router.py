@@ -1,6 +1,8 @@
 from typing import Annotated
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.auth.models import User
 from .dependencies import (
     get_all_question,
     get_question_by_id,
@@ -10,6 +12,7 @@ from .dependencies import (
 from src.db.database import db_helper
 from .schemas import QuestionUpdate, QuestionRead, QuestionCreate
 from src.config import settings
+from src.auth.fastapi_users import get_current_active_superuser
 
 router = APIRouter(
     prefix=settings.api.prefix_question,
@@ -38,6 +41,7 @@ async def get_question(
 async def create_new_question(
     question_in: QuestionCreate,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    user: Annotated[User, Depends(get_current_active_superuser)],
 ):
     new_question = await create_question(question_in=question_in, session=session)
     return new_question
