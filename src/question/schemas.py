@@ -1,4 +1,7 @@
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict
+from src.category.schemas import CategoryRead
 
 
 class QuestionBase(BaseModel):
@@ -15,16 +18,18 @@ class QuestionUpdate(QuestionBase):
     category_id: int
 
 
-class QuestionRead(QuestionBase):
+class QuestionReadBase(QuestionBase):
     id: int
-    title: str
-    category_id: int
     category: "CategoryRead"
-    answer: "AnswerRead"
     model_config = ConfigDict(from_attributes=True)
 
+class QuestionReadNested(QuestionReadBase):
+    pass
 
-from src.answer.schemas import AnswerRead
-from src.category.schemas import CategoryRead
+class QuestionRead(QuestionReadBase):
+    answer: Optional["AnswerReadNested"]
+
+
+from src.answer.schemas import AnswerReadNested
 
 QuestionRead.model_rebuild()

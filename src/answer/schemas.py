@@ -15,6 +15,16 @@ class AnswerUpdate(BaseModel):
     question_id: int | None
 
 
-class AnswerRead(AnswerBase):
+class AnswerReadBase(AnswerBase):
     id: int
     model_config = ConfigDict(from_attributes=True)
+
+class AnswerReadNested(AnswerReadBase):
+    pass
+
+class AnswerRead(AnswerReadBase):
+    question: "QuestionReadNested"
+    model_config = ConfigDict(from_attributes=True)
+
+from src.question.schemas import QuestionReadNested
+AnswerRead.model_rebuild()

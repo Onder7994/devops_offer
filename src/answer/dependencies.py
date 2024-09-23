@@ -7,17 +7,32 @@ from src.answer.schemas import AnswerCreate, AnswerUpdate
 from src.answer.models import Answer
 from fastapi import HTTPException, status
 
+from src.question import Question
+
 
 async def get_all_answers(session: AsyncSession) -> Sequence[Answer]:
-    stmt = select(Answer).order_by(Answer.id)
+    stmt = (
+        select(Answer)
+        .options(
+            selectinload(Answer.question).options(
+                selectinload(Question.category)
+            )
+        )
+        .order_by(Answer.id)
+    )
     result = await session.scalars(stmt)
     return result.all()
 
 
 async def get_answer_by_id(answer_id: int, session: AsyncSession) -> Answer | None:
     stmt = (
-        select(Answer).where(Answer.id == answer_id)
-        # .options(selectinload(Answer.question))
+        select(Answer)
+        .where(Answer.id == answer_id)
+        .options(
+            selectinload(Answer.question).options(
+                selectinload(Question.category)
+            )
+        )
     )
     result = await session.scalars(stmt)
     answer = result.first()
