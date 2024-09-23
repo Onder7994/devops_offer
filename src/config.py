@@ -20,6 +20,7 @@ class ApiPrefix(BaseModel):
     prefix_category: str = "/api/categories"
     prefix_answer: str = "/api/answers"
     prefix_question: str = "/api/questions"
+    prefix_favorites: str = "/api/favorites"
 
 
 class DatabaseConfig(BaseModel):

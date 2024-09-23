@@ -1,11 +1,7 @@
 from typing import Sequence
-from unicodedata import category
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlalchemy.testing.plugin.plugin_base import options
-
 from src.category.dependencies import get_category_by_id
 from src.question.schemas import QuestionRead, QuestionCreate, QuestionUpdate
 from fastapi import HTTPException, status
@@ -44,9 +40,6 @@ async def get_question_by_id(
 async def create_question(
     question_in: QuestionCreate, session: AsyncSession
 ) -> Question:
-    new_question = Question(
-        title=question_in.title, category_id=question_in.category_id
-    )
     is_category_exit = await get_category_by_id(
         category_id=question_in.category_id, session=session
     )
@@ -55,10 +48,24 @@ async def create_question(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Category not found.",
         )
+    new_question = Question(
+        title=question_in.title, category_id=question_in.category_id
+    )
     session.add(new_question)
     await session.commit()
     await session.refresh(new_question)
-    return new_question
+    stmt = (
+        select(Question)
+        .options(
+            selectinload(Question.category),
+            selectinload(Question.answer),
+        )
+        .where(Question.id == new_question.id)
+    )
+    result = await session.scalars(stmt)
+    question_with_relations = result.first()
+
+    return question_with_relations
 
 
 async def update_question(
