@@ -1,7 +1,11 @@
+from typing import Literal
+
 from pydantic import BaseModel
 from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
+LOG_DEFAULT_FORMAT = "[%(asctime)s.%(msecs)03d] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
 
 class RunConfig(BaseModel):
     host: str = "0.0.0.0"
@@ -10,6 +14,8 @@ class RunConfig(BaseModel):
 
 
 class ApiPrefix(BaseModel):
+    prefix_auth: str = "/api/auth"
+    prefix_jwt: str = "/api/auth/jwt"
     prefix_users: str = "/api/users"
     prefix_category: str = "/api/categories"
     prefix_answer: str = "/api/answers"
@@ -31,6 +37,20 @@ class DatabaseConfig(BaseModel):
         "pk": "pk_%(table_name)s",
     }
 
+class AccessTokenConfig(BaseModel):
+    secret: str
+    lifetime_seconds: int = 3600
+
+class LoggingConfig(BaseModel):
+    log_level: Literal[
+        'debug',
+        'info',
+        'warning',
+        'error',
+        'critical',
+    ] = 'info'
+    log_format: str = LOG_DEFAULT_FORMAT
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -40,7 +60,9 @@ class Settings(BaseSettings):
     )
     run: RunConfig = RunConfig()
     api: ApiPrefix = ApiPrefix()
+    logging: LoggingConfig = LoggingConfig()
     db: DatabaseConfig
+    access_token: AccessTokenConfig
 
 
 settings = Settings()
