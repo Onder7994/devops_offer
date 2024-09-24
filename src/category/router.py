@@ -1,17 +1,20 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from . import Category
 from .dependencies import (
     get_all_category,
     get_category_by_id,
     create_category,
     update_category,
+    get_questions_by_category_id,
 )
 from src.db.database import db_helper
 from .schemas import CategoryRead, CategoryUpdate, CategoryCreate
 from src.config import settings
 from src.auth.models import User
-from src.auth.fastapi_users import get_current_active_superuser
+from src.auth.fastapi_users import current_active_superuser
 
 router = APIRouter(
     prefix=settings.api.prefix_category,
@@ -40,7 +43,7 @@ async def get_category(
 async def create_new_category(
     category_in: CategoryCreate,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    user: Annotated[User, Depends(get_current_active_superuser)],
+    _: Annotated[User, Depends(current_active_superuser)],
 ):
     new_category = await create_category(category_in=category_in, session=session)
     return new_category
@@ -51,6 +54,7 @@ async def update_existing_category(
     category_in: CategoryUpdate,
     category_id: int,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    _: Annotated[User, Depends(current_active_superuser)],
 ):
     updated_category = await update_category(
         category_id=category_id, category_in=category_in, session=session

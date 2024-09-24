@@ -1,0 +1,13 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<h1>Вопрос: {{ question.title }}</h1>
+<p>Категория: <a href="/categories/view/{{ question.category.id }}">{{ question.category.name }}</a></p>
+
+{% if question.answer %}
+    <h2>Ответ:</h2>
+    <p>{{ question.answer.content }}</p>
+{% else %}
+    <p>Ответ еще не добавлен.</p>
+{% endif %}
+{% endblock %}

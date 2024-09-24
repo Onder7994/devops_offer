@@ -12,6 +12,8 @@ from .dependencies import (
 from src.db.database import db_helper
 from .schemas import AnswerRead, AnswerCreate, AnswerUpdate
 from src.config import settings
+from src.auth.fastapi_users import current_active_superuser
+from src.auth.models import User
 
 router = APIRouter(
     prefix=settings.api.prefix_answer,
@@ -40,6 +42,7 @@ async def get_answer(
 async def create_new_answer(
     answer_in: AnswerCreate,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    _: Annotated[User, Depends(current_active_superuser)],
 ):
     new_answer = await create_answer(answer_in=answer_in, session=session)
     return new_answer
@@ -50,6 +53,7 @@ async def update_existing_answer(
     answer_id: int,
     answer_in: AnswerUpdate,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    _: Annotated[User, Depends(current_active_superuser)],
 ):
     updated_answer = await update_answer(
         answer_id=answer_id,

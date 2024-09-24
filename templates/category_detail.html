@@ -1,0 +1,14 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<h1>Категория: {{ category.name }}</h1>
+
+<h2>Вопросы</h2>
+<ul class="list-group">
+    {% for question in questions %}
+    <li class="list-group-item">
+        <a href="/view/questions/{{ question.id }}">{{ question.title }}</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

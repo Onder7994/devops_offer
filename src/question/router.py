@@ -12,7 +12,7 @@ from .dependencies import (
 from src.db.database import db_helper
 from .schemas import QuestionUpdate, QuestionRead, QuestionCreate
 from src.config import settings
-from src.auth.fastapi_users import get_current_active_superuser
+from src.auth.fastapi_users import current_active_superuser
 
 router = APIRouter(
     prefix=settings.api.prefix_question,
@@ -41,7 +41,7 @@ async def get_question(
 async def create_new_question(
     question_in: QuestionCreate,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    user: Annotated[User, Depends(get_current_active_superuser)],
+    _: Annotated[User, Depends(current_active_superuser)],
 ):
     new_question = await create_question(question_in=question_in, session=session)
     return new_question
@@ -52,6 +52,7 @@ async def update_existing_question(
     question_id: int,
     question_in: QuestionUpdate,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    _: Annotated[User, Depends(current_active_superuser)],
 ):
     updated_question = await update_question(
         question_id=question_id, question_in=question_in, session=session

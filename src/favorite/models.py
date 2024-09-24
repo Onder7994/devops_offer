@@ -7,12 +7,11 @@ if TYPE_CHECKING:
     from src.auth.models import User
     from src.question.models import Question
 
+
 class Favorite(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
     question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
 
     user: Mapped["User"] = relationship("User", back_populates="favorites")
     question: Mapped["Question"] = relationship("Question")
-
-    __table_args__ = (UniqueConstraint("user_id", "question_id", name="_user_question_uc"),)

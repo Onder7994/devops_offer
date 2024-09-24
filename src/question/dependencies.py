@@ -37,6 +37,20 @@ async def get_question_by_id(
     return question
 
 
+async def get_question_by_id_view(
+    question_id: int, session: AsyncSession
+) -> Question | None:
+    stmt = (
+        select(Question)
+        .where(Question.id == question_id)
+        .options(selectinload(Question.category))
+        .options(selectinload(Question.answer))
+    )
+    result = await session.scalars(stmt)
+    question = result.first()
+    return question
+
+
 async def create_question(
     question_in: QuestionCreate, session: AsyncSession
 ) -> Question:

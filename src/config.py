@@ -5,7 +5,10 @@ from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-LOG_DEFAULT_FORMAT = "[%(asctime)s.%(msecs)03d] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
+LOG_DEFAULT_FORMAT = (
+    "[%(asctime)s.%(msecs)03d] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
+)
+
 
 class RunConfig(BaseModel):
     host: str = "0.0.0.0"
@@ -23,6 +26,13 @@ class ApiPrefix(BaseModel):
     prefix_favorites: str = "/api/favorites"
 
 
+class ViewsPrefix(BaseModel):
+    prefix_category: str = "/view/categories"
+    prefix_question: str = "/view/questions"
+    prefix_auth: str = "/auth"
+    prefix_profile: str = "/profile"
+
+
 class DatabaseConfig(BaseModel):
     url: PostgresDsn
     echo: bool = False
@@ -38,18 +48,20 @@ class DatabaseConfig(BaseModel):
         "pk": "pk_%(table_name)s",
     }
 
+
 class AccessTokenConfig(BaseModel):
     secret: str
     lifetime_seconds: int = 3600
 
+
 class LoggingConfig(BaseModel):
     log_level: Literal[
-        'debug',
-        'info',
-        'warning',
-        'error',
-        'critical',
-    ] = 'info'
+        "debug",
+        "info",
+        "warning",
+        "error",
+        "critical",
+    ] = "info"
     log_format: str = LOG_DEFAULT_FORMAT
 
 
@@ -64,6 +76,7 @@ class Settings(BaseSettings):
     logging: LoggingConfig = LoggingConfig()
     db: DatabaseConfig
     access_token: AccessTokenConfig
+    views: ViewsPrefix = ViewsPrefix()
 
 
 settings = Settings()
