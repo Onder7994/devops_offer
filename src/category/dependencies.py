@@ -67,3 +67,24 @@ async def get_questions_by_category_id(
     stmt = select(Question).where(Question.category_id == category_id)
     result = await session.scalars(stmt)
     return result.all()
+
+
+async def delete_category(category_id: int, session: AsyncSession):
+    stmt = select(Category).where(Category.id == category_id)
+    result = await session.scalars(stmt)
+    category = result.first()
+    if not category:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Category not found",
+        )
+    if category.questions:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Can't delete category with existing questions",
+        )
+    await session.delete(category)
+    await session.commit()
+    return {
+        f"Category {category} was deleted",
+    }

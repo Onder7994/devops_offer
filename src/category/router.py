@@ -8,7 +8,7 @@ from .dependencies import (
     get_category_by_id,
     create_category,
     update_category,
-    get_questions_by_category_id,
+    delete_category,
 )
 from src.db.database import db_helper
 from .schemas import CategoryRead, CategoryUpdate, CategoryCreate
@@ -60,3 +60,18 @@ async def update_existing_category(
         category_id=category_id, category_in=category_in, session=session
     )
     return updated_category
+
+
+@router.delete(
+    "/{category_id}", response_model=CategoryRead, status_code=status.HTTP_200_OK
+)
+async def delete_category(
+    category_id: int,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    _: Annotated[User, Depends(current_active_superuser)],
+):
+    deleted_category = await delete_category(
+        category_id=category_id,
+        session=session,
+    )
+    return deleted_category

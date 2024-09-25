@@ -14,4 +14,6 @@ class Category(Base):
     name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=True)
 
-    questions: Mapped[list["Question"]] = relationship(back_populates="category")
+    questions: Mapped[list["Question"]] = relationship(
+        back_populates="category", cascade="all, delete-orphan", passive_deletes=True
+    )

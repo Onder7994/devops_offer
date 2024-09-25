@@ -60,8 +60,8 @@ main_app.include_router(profile_view_router)
 @main_app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def home(
     request: Request,
+    categories: Annotated[Sequence[Category], Depends(get_categories)],
     user: Annotated[User, Depends(fastapi_users.current_user(optional=True))] = None,
-    categories: Sequence[Category] = Depends(get_categories),
 ):
     return templates.TemplateResponse(
         "home.html",
