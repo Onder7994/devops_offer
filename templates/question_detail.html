@@ -1,13 +1,22 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-<h1>Вопрос: {{ question.title }}</h1>
-<p>Категория: <a href="/categories/view/{{ question.category.id }}">{{ question.category.name }}</a></p>
+<div class="container">
+    <h1 class="text-center my-4">Вопрос: {{ question.title }}</h1>
+    <p>Категория: <a href="/view/categories/{{ question.category.id }}" class="text-decoration-none">{{ question.category.name }}</a></p>
 
-{% if question.answer %}
-    <h2>Ответ:</h2>
-    <p>{{ question.answer.content }}</p>
-{% else %}
-    <p>Ответ еще не добавлен.</p>
-{% endif %}
+    {% if question.answer %}
+        <div class="card my-4">
+            <div class="card-body">
+                <h2 class="card-title">Ответ:</h2>
+                <p class="card-text">{{ question.answer.content }}</p>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            Ответ еще не добавлен.
+        </div>
+    {% endif %}
+</div>
 {% endblock %}
+
