@@ -92,3 +92,24 @@ async def update_question(
     await session.commit()
     await session.refresh(question)
     return question
+
+
+async def delete_question_by_id(
+    question_id: int,
+    session: AsyncSession,
+):
+    stmt = (
+        select(Question)
+        .where(Question.id == question_id)
+        .options(selectinload(Question.category))
+        .options(selectinload(Question.answer))
+    )
+    question = await session.scalar(stmt)
+    if not question:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Question not found.",
+        )
+    await session.delete(question)
+    await session.commit()
+    return {"success": "ok"}

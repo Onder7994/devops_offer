@@ -15,5 +15,5 @@ class Question(Base):
 
     category: Mapped["Category"] = relationship("Category", back_populates="questions")
     answer: Mapped["Answer"] = relationship(
-        "Answer", back_populates="question", uselist=False
+        "Answer", back_populates="question", uselist=False, cascade="all, delete-orphan", passive_deletes=True,
     )

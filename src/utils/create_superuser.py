@@ -9,11 +9,11 @@ from src.favorite.models import Favorite
 from src.question.models import Question
 from src.category.models import Category
 from src.answer.models import Answer
-
+from src.config import settings
 logger = logging.getLogger(__name__)
 
 DATABASE_URL = os.environ.get(
-    "DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost/devops_offer"
+    "DATABASE_URL", f"{settings.db.url}"
 )
 engine = create_async_engine(DATABASE_URL, echo=True)
 

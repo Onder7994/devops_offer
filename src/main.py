@@ -5,12 +5,10 @@ from fastapi import FastAPI, Request, Depends
 from fastapi.responses import ORJSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.category.models import Category
 from src.auth.models import User
 from src.auth.router import fastapi_users
-
 from src.answer.router import router as answer_router
 from src.category.router import router as category_router
 from src.category.views import router as category_view_router

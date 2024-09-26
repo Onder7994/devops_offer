@@ -8,6 +8,7 @@ from .dependencies import (
     get_question_by_id,
     create_question,
     update_question,
+    delete_question_by_id,
 )
 from src.db.database import db_helper
 from .schemas import QuestionUpdate, QuestionRead, QuestionCreate
@@ -58,3 +59,15 @@ async def update_existing_question(
         question_id=question_id, question_in=question_in, session=session
     )
     return updated_question
+
+
+@router.delete("/{question_id}", status_code=status.HTTP_200_OK)
+async def delete_question(
+    question_id: int,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    _: Annotated[User, Depends(current_active_superuser)],
+):
+    deleted_question = await delete_question_by_id(
+        question_id=question_id, session=session
+    )
+    return deleted_question

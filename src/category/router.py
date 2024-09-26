@@ -8,7 +8,7 @@ from .dependencies import (
     get_category_by_id,
     create_category,
     update_category,
-    delete_category,
+    delete_category_by_id,
 )
 from src.db.database import db_helper
 from .schemas import CategoryRead, CategoryUpdate, CategoryCreate
@@ -70,7 +70,7 @@ async def delete_category(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     _: Annotated[User, Depends(current_active_superuser)],
 ):
-    deleted_category = await delete_category(
+    deleted_category = await delete_category_by_id(
         category_id=category_id,
         session=session,
     )

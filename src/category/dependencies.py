@@ -1,6 +1,7 @@
 from typing import Sequence, List
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.question.models import Question
 from src.category.schemas import CategoryCreate, CategoryUpdate
@@ -69,8 +70,8 @@ async def get_questions_by_category_id(
     return result.all()
 
 
-async def delete_category(category_id: int, session: AsyncSession):
-    stmt = select(Category).where(Category.id == category_id)
+async def delete_category_by_id(category_id: int, session: AsyncSession):
+    stmt = select(Category).where(Category.id == category_id).options(selectinload(Category.questions))
     result = await session.scalars(stmt)
     category = result.first()
     if not category:
@@ -85,6 +86,4 @@ async def delete_category(category_id: int, session: AsyncSession):
         )
     await session.delete(category)
     await session.commit()
-    return {
-        f"Category {category} was deleted",
-    }
+    return category
