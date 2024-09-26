@@ -19,4 +19,5 @@ class CategoryRead(CategoryBase):
     id: int
     name: str
     description: str
+    slug: str
     model_config = ConfigDict(from_attributes=True)

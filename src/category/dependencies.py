@@ -1,4 +1,6 @@
 from typing import Sequence, List
+
+from slugify import slugify
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -37,11 +39,20 @@ async def get_category_by_id_view(
     return category
 
 
+async def get_category_by_slug(slug: str, session: AsyncSession) -> Category | None:
+    stmt = select(Category).where(Category.slug == slug)
+    result = await session.scalars(stmt)
+    category = result.first()
+    return category
+
+
 async def create_category(
     category_in: CategoryCreate, session: AsyncSession
 ) -> Category:
+    slug = slugify(category_in.name)
     new_category = Category(
         name=category_in.name,
+        slug=slug,
         description=category_in.description,
     )
     session.add(new_category)
@@ -71,7 +82,11 @@ async def get_questions_by_category_id(
 
 
 async def delete_category_by_id(category_id: int, session: AsyncSession):
-    stmt = select(Category).where(Category.id == category_id).options(selectinload(Category.questions))
+    stmt = (
+        select(Category)
+        .where(Category.id == category_id)
+        .options(selectinload(Category.questions))
+    )
     result = await session.scalars(stmt)
     category = result.first()
     if not category:
