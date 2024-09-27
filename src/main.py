@@ -5,10 +5,9 @@ from fastapi import FastAPI, Request, Depends
 from fastapi.responses import ORJSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-
+from src.auth.fastapi_users import current_active_user_ui
 from src.category.models import Category
 from src.auth.models import User
-from src.auth.router import fastapi_users
 from src.answer.router import router as answer_router
 from src.category.router import router as category_router
 from src.category.views import router as category_view_router
@@ -59,7 +58,7 @@ main_app.include_router(profile_view_router)
 async def home(
     request: Request,
     categories: Annotated[Sequence[Category], Depends(get_categories)],
-    user: Annotated[User, Depends(fastapi_users.current_user(optional=True))] = None,
+    user: Annotated[User, Depends(current_active_user_ui)] = None,
 ):
     return templates.TemplateResponse(
         "home.html",

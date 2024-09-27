@@ -1,4 +1,4 @@
-{% extends "./layouts/base.html" %}
+{% extends "layouts/base.html" %}
 
 {% block content %}
 <h1>Профиль пользователя</h1>
@@ -7,7 +7,7 @@
 
 <h2>Избранные категории</h2>
 <ul class="list-group">
-    {% for favorite in user.favorites %}
+    {% for favorite in favorites %}
     <li class="list-group-item">
         <a href="/categories/view/{{ favorite.question.category.id }}">{{ favorite.question.category.name }}</a>
         - <a href="/questions/view/{{ favorite.question.id }}">{{ favorite.question.title }}</a>

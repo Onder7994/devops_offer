@@ -23,8 +23,10 @@ class QuestionReadBase(QuestionBase):
     category: "CategoryRead"
     model_config = ConfigDict(from_attributes=True)
 
+
 class QuestionReadNested(QuestionReadBase):
     pass
+
 
 class QuestionRead(QuestionReadBase):
     answer: Optional["AnswerReadNested"]

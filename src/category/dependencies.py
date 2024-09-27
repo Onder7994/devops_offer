@@ -49,7 +49,7 @@ async def get_category_by_slug(slug: str, session: AsyncSession) -> Category | N
 async def create_category(
     category_in: CategoryCreate, session: AsyncSession
 ) -> Category:
-    slug = slugify(category_in.name)
+    slug = slugify(category_in.name, separator="_")
     new_category = Category(
         name=category_in.name,
         slug=slug,

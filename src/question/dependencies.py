@@ -1,4 +1,6 @@
 from typing import Sequence
+
+from slugify import slugify
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -51,6 +53,18 @@ async def get_question_by_id_view(
     return question
 
 
+async def get_question_by_slug(slug: str, session: AsyncSession) -> Question | None:
+    stmt = (
+        select(Question)
+        .where(Question.slug == slug)
+        .options(selectinload(Question.category))
+        .options(selectinload(Question.answer))
+    )
+    result = await session.scalars(stmt)
+    question = result.first()
+    return question
+
+
 async def create_question(
     question_in: QuestionCreate, session: AsyncSession
 ) -> Question:
@@ -62,8 +76,11 @@ async def create_question(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Category not found.",
         )
+    slug = slugify(question_in.title, separator="_")
     new_question = Question(
-        title=question_in.title, category_id=question_in.category_id
+        title=question_in.title,
+        category_id=question_in.category_id,
+        slug=slug,
     )
     session.add(new_question)
     await session.commit()

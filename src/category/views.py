@@ -10,7 +10,7 @@ from .dependencies import (
 from src.db.database import db_helper
 from src.config import settings
 from src.auth.models import User
-from src.auth.fastapi_users import fastapi_users
+from src.auth.fastapi_users import current_active_user_ui
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from src.common.dependencies import get_categories
@@ -28,7 +28,7 @@ async def view_single_category(
     request: Request,
     slug: str,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    user: Annotated[User, Depends(fastapi_users.current_user(optional=True))] = None,
+    user: Annotated[User, Depends(current_active_user_ui)] = None,
     categories: Sequence[Category] = Depends(get_categories),
 ):
     category = await get_category_by_slug(slug=slug, session=session)
