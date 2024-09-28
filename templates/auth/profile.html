@@ -1,17 +1,60 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-<h1>Профиль пользователя</h1>
-<p>Email: {{ user.email }}</p>
-<p>Роль: {{ user.role }}</p>
+<div class="container mt-5">
+    <div class="row">
+        <!-- Карточка с информацией о пользователе -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h2 class="mb-0">
+                        <i class="bi bi-person-circle"></i> Профиль пользователя
+                    </h2>
+                </div>
+                <div class="card-body text-center">
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Роль:</strong> {{ user.role }}</p>
+                    <a href="/profile/edit" class="btn btn-outline-primary mt-3">
+                        <i class="bi bi-pencil"></i> Редактировать профиль
+                    </a>
+                </div>
+            </div>
+        </div>
 
-<h2>Избранные категории</h2>
-<ul class="list-group">
-    {% for favorite in favorites %}
-    <li class="list-group-item">
-        <a href="/categories/view/{{ favorite.question.category.id }}">{{ favorite.question.category.name }}</a>
-        - <a href="/questions/view/{{ favorite.question.id }}">{{ favorite.question.title }}</a>
-    </li>
-    {% endfor %}
-</ul>
+        <!-- Карточка с избранными категориями -->
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white text-center">
+                    <h2 class="mb-0">
+                        <i class="bi bi-heart"></i> Избранные категории
+                    </h2>
+                </div>
+                <div class="card-body">
+                    {% if favorites %}
+                        <ul class="list-group list-group-flush">
+                            {% for favorite in favorites %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <a href="/categories/view/{{ favorite.question.category.id }}" class="text-decoration-none">
+                                            {{ favorite.question.category.name }}
+                                        </a>
+                                        <span class="text-muted"> - </span>
+                                        <a href="/questions/view/{{ favorite.question.id }}" class="text-decoration-none">
+                                            {{ favorite.question.title }}
+                                        </a>
+                                    </div>
+                                    <a href="/favorites/remove/{{ favorite.id }}" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash"></i> Удалить
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">У вас пока нет избранных категорий.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

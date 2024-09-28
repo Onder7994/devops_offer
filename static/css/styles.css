@@ -73,3 +73,16 @@ body {
 .form-label {
     font-weight: 500;
 }
+
+.card-header {
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+.list-group-item {
+    transition: background-color 0.3s ease;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}

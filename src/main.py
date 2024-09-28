@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
 from typing import Annotated, Sequence
 
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI, Request, Depends, status
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import ORJSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -52,6 +53,18 @@ main_app.include_router(category_view_router)
 main_app.include_router(question_view_router)
 main_app.include_router(auth_view_router)
 main_app.include_router(profile_view_router)
+
+
+@main_app.exception_handler(StarletteHTTPException)
+async def front_http_exception(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        return templates.TemplateResponse(
+            "404.html",
+            {
+                "request": request,
+            },
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
 
 
 @main_app.get("/", response_class=HTMLResponse, include_in_schema=False)
