@@ -1,4 +1,4 @@
-from pydantic import EmailStr, BaseModel, constr, field_validator
+from pydantic import EmailStr, BaseModel, constr, field_validator, model_validator
 from fastapi_users import schemas
 
 
@@ -17,11 +17,11 @@ class UserUpdate(schemas.BaseUserUpdate):
 class RegisterForm(BaseModel):
     email: EmailStr
     password: constr(min_length=6)
-    password_confirm: str
+    password_confirm: constr(min_length=6)
 
-    @field_validator("password_confirm")
+    @model_validator(mode="after")
     @classmethod
-    def password_match(cls, v, values, **kwargs):
-        if "password" in values and v != values["password"]:
+    def passwords_match(cls, model):
+        if model.password != model.password_confirm:
             raise ValueError("Пароли не совпадают")
-        return v
+        return model
