@@ -1,6 +1,18 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-<h1>Ошибка 404</h1>
-<p>{{ message }}</p>
+<div class="d-flex justify-content-center align-items-center" style="height: 60vh;">
+    <div class="card text-center shadow p-4">
+        <div class="card-body">
+            <h1 class="card-title display-4">Ошибка 404</h1>
+            <p class="card-text">
+                <i class="bi bi-emoji-frown" style="font-size: 2rem; color: #856404;"></i>
+            </p>
+            <p class="card-text">
+                {{ message }} Страница не найдена!
+            </p>
+            <a href="/" class="btn btn-primary">Вернуться на главную</a>
+        </div>
+    </div>
+</div>
 {% endblock %}
