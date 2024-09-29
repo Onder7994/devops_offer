@@ -2,8 +2,21 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="text-center my-4">Редактирование профиля</h1>
-
+    <h1 class="text-center mb-4">Редактирование профиля</h1>
+    {% if errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% if success %}
+        <div class="alert alert-success mt-4">
+            Профиль успешно обновлен!
+        </div>
+    {% endif %}
     <!-- Форма для редактирования профиля -->
     <form method="POST" action="/profile/edit" class="mx-auto" style="max-width: 600px;">
         <!-- CSRF-токен, если у вас есть защита от CSRF -->
@@ -36,23 +49,5 @@
         <!-- Кнопка для сохранения изменений -->
         <button type="submit" class="btn btn-primary">Сохранить изменения</button>
     </form>
-
-    <!-- Отображение ошибок -->
-    {% if errors %}
-        <div class="alert alert-danger mt-4">
-            <ul>
-                {% for error in errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
-
-    <!-- Сообщение об успешном обновлении -->
-    {% if success %}
-        <div class="alert alert-success mt-4">
-            Профиль успешно обновлен!
-        </div>
-    {% endif %}
 </div>
 {% endblock %}
