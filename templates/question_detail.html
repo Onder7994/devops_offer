@@ -17,6 +17,9 @@
             Ответ еще не добавлен.
         </div>
     {% endif %}
+    <button class="btn btn-outline-warning add-to-favorites" data-question-id="{{ question.id }}">
+        <i class="fa fa-star"></i> В избранное
+    </button>
 </div>
 {% endblock %}
 

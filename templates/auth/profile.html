@@ -8,12 +8,13 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white text-center">
                     <h2 class="mb-0">
-                        <i class="bi bi-person-circle"></i> Профиль пользователя
+                        <i class="bi bi-person-circle"></i> Профиль
                     </h2>
                 </div>
                 <div class="card-body text-center">
                     <p><strong>Email:</strong> {{ user.email }}</p>
-                    <p><strong>Роль:</strong> {{ user.role }}</p>
+                    <p><strong>Username:</strong> {{ user.username }}</p>
+                    <p><strong>Верифицирован:</strong> {{ user.is_verified }}</p>
                     <a href="/profile/edit" class="btn btn-outline-primary mt-3">
                         <i class="bi bi-pencil"></i> Редактировать профиль
                     </a>

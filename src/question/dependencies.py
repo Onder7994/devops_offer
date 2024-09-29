@@ -76,7 +76,7 @@ async def create_question(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Category not found.",
         )
-    slug = slugify(question_in.title, separator="_")
+    slug = slugify(question_in.title)
     new_question = Question(
         title=question_in.title,
         category_id=question_in.category_id,

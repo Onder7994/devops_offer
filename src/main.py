@@ -6,6 +6,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import ORJSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+
+from src.category.dependencies import get_all_category
 from src.auth.fastapi_users import current_active_user_ui
 from src.category.models import Category
 from src.auth.models import User
@@ -38,36 +40,71 @@ async def lifespan(app: FastAPI):
     await db_helper.dispose()
 
 
-main_app = FastAPI(
+app = FastAPI(
+    lifespan=lifespan,
+    title=settings.run.title,
+    default_response_class=ORJSONResponse,
+    openapi_url=None,
+    docs_url=None,
+    redoc_url=None,
+)
+
+api_app = FastAPI(
     lifespan=lifespan,
     title=settings.run.title,
     default_response_class=ORJSONResponse,
 )
-main_app.mount("/static", StaticFiles(directory="static"), name="static")
-main_app.include_router(auth_router)
-main_app.include_router(favorite_router)
-main_app.include_router(category_router)
-main_app.include_router(question_router)
-main_app.include_router(answer_router)
-main_app.include_router(category_view_router)
-main_app.include_router(question_view_router)
-main_app.include_router(auth_view_router)
-main_app.include_router(profile_view_router)
+
+front_app = FastAPI(
+    lifespan=lifespan,
+    title=settings.run.title,
+    default_response_class=ORJSONResponse,
+    openapi_url=None,
+    docs_url=None,
+    redoc_url=None,
+)
+
+app.mount("/api", api_app)
+app.mount("/", front_app)
+
+api_app.include_router(auth_router)
+api_app.include_router(favorite_router)
+api_app.include_router(category_router)
+api_app.include_router(question_router)
+api_app.include_router(answer_router)
+
+front_app.mount("/static", StaticFiles(directory="static"), name="static")
+front_app.include_router(category_view_router)
+front_app.include_router(question_view_router)
+front_app.include_router(auth_view_router)
+front_app.include_router(profile_view_router)
 
 
-@main_app.exception_handler(StarletteHTTPException)
-async def front_http_exception(request: Request, exc: StarletteHTTPException):
+@front_app.exception_handler(StarletteHTTPException)
+async def front_http_exception(
+    request: Request,
+    exc: StarletteHTTPException,
+):
     if exc.status_code == 404:
+        session_generator = db_helper.session_getter()
+        session = await anext(session_generator)
+        user = current_active_user_ui
+        try:
+            categories = await get_all_category(session=session)
+        finally:
+            await session_generator.aclose()
         return templates.TemplateResponse(
             "404.html",
             {
                 "request": request,
+                "categories": categories,
+                "user": user,
             },
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
 
-@main_app.get("/", response_class=HTMLResponse, include_in_schema=False)
+@front_app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def home(
     request: Request,
     categories: Annotated[Sequence[Category], Depends(get_categories)],
@@ -85,7 +122,7 @@ async def home(
 
 if __name__ == "__main__":
     uvicorn.run(
-        "src.main:main_app",
+        "src.main:app",
         host=settings.run.host,
         port=settings.run.port,
         reload=True,

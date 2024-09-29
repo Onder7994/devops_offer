@@ -3,18 +3,19 @@ from fastapi_users import schemas
 
 
 class UserRead(schemas.BaseUser[int]):
-    pass
+    username: str
 
 
 class UserCreate(schemas.BaseUserCreate):
-    pass
+    username: str
 
 
 class UserUpdate(schemas.BaseUserUpdate):
-    pass
+    username: str
 
 
 class RegisterForm(BaseModel):
+    username: str
     email: EmailStr
     password: constr(min_length=6)
     password_confirm: constr(min_length=6)

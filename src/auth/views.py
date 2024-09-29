@@ -44,12 +44,35 @@ async def login_form(
     )
 
 
+@router.get("/logout", response_class=RedirectResponse)
+async def logout(
+    request: Request,
+    user_manager: Annotated[UserManager, Depends(get_user_manager)],
+    user: Annotated[User, Depends(current_active_user_ui)],
+):
+    strategy = auth_backend_cookie.get_strategy()
+    token = await strategy.read_token(request, user_manager=user_manager)
+    if token:
+        auth_backend_cookie.logout(strategy=strategy, user=user, token=token)
+    response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    response.delete_cookie(
+        key=auth_backend_cookie.transport.cookie_name,
+        path=auth_backend_cookie.transport.cookie_path,
+        domain=auth_backend_cookie.transport.cookie_domain,
+        secure=auth_backend_cookie.transport.cookie_secure,
+        httponly=auth_backend_cookie.transport.cookie_httponly,
+        samesite=auth_backend_cookie.transport.cookie_samesite,
+    )
+    return response
+
+
 @router.post("/login", response_class=HTMLResponse)
 async def login(
     request: Request,
     user_manager: Annotated[UserManager, Depends(get_user_manager)],
     username: str = Form(...),
     password: str = Form(...),
+    categories: Sequence[Category] = Depends(get_categories),
 ):
     try:
         user = await user_manager.authenticate(
@@ -59,10 +82,24 @@ async def login(
                 scope="",
             )
         )
+        if user is None:
+            return templates.TemplateResponse(
+                "auth/login.html",
+                {
+                    "request": request,
+                    "error": "Неверный email или пароль",
+                    "categories": categories,
+                },
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
     except (InvalidPasswordException, UserNotExists):
         return templates.TemplateResponse(
             "auth/login.html",
-            {"request": request, "error": "Неверный email или пароль"},
+            {
+                "request": request,
+                "error": "Неверный email или пароль",
+                "categories": categories,
+            },
             status_code=status.HTTP_400_BAD_REQUEST,
         )
 
@@ -108,13 +145,17 @@ async def register(
     request: Request,
     user_manager: Annotated[UserManager, Depends(get_user_manager)],
     categories: Sequence[Category] = Depends(get_categories),
+    username: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
     password_confirm: str = Form(...),
 ):
     try:
         form = RegisterForm(
-            email=email, password=password, password_confirm=password_confirm
+            username=username,
+            email=email,
+            password=password,
+            password_confirm=password_confirm,
         )
     except ValidationError as err:
         errors_messages = [err["msg"] for err in err.errors()]
@@ -129,7 +170,9 @@ async def register(
         )
 
     try:
-        user_create = UserCreate(email=form.email, password=form.password)
+        user_create = UserCreate(
+            username=username, email=form.email, password=form.password
+        )
         user = await user_manager.create(user_create)
     except UserAlreadyExists:
         return templates.TemplateResponse(

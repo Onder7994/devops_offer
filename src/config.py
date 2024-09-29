@@ -17,13 +17,13 @@ class RunConfig(BaseModel):
 
 
 class ApiPrefix(BaseModel):
-    prefix_auth: str = "/api/auth"
-    prefix_jwt: str = "/api/auth/jwt"
-    prefix_users: str = "/api/users"
-    prefix_category: str = "/api/categories"
-    prefix_answer: str = "/api/answers"
-    prefix_question: str = "/api/questions"
-    prefix_favorites: str = "/api/favorites"
+    prefix_auth: str = "/auth"
+    prefix_jwt: str = "/auth/jwt"
+    prefix_users: str = "/users"
+    prefix_category: str = "/categories"
+    prefix_answer: str = "/answers"
+    prefix_question: str = "/questions"
+    prefix_favorites: str = "/favorites"
 
 
 class ViewsPrefix(BaseModel):

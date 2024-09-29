@@ -10,11 +10,10 @@ from src.question.models import Question
 from src.category.models import Category
 from src.answer.models import Answer
 from src.config import settings
+
 logger = logging.getLogger(__name__)
 
-DATABASE_URL = os.environ.get(
-    "DATABASE_URL", f"{settings.db.url}"
-)
+DATABASE_URL = os.environ.get("DATABASE_URL", f"{settings.db.url}")
 engine = create_async_engine(DATABASE_URL, echo=True)
 
 async_session_maker = async_sessionmaker(
@@ -23,6 +22,7 @@ async_session_maker = async_sessionmaker(
 
 
 async def create_superuser():
+    username = os.environ.get("ADMIN_USERNAME", "admin")
     email = os.environ.get("ADMIN_EMAIL", "admin@example.com")
     password = os.environ.get("ADMIN_PASSWORD", "admin")
     passwd_helper = PasswordHelper()
@@ -36,6 +36,7 @@ async def create_superuser():
             logger.error(f"User with email %s already exists", email)
             return
         new_user = User(
+            username=username,
             email=email,
             hashed_password=hashed_password,
             is_active=True,
