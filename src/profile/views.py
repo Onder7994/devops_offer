@@ -19,7 +19,7 @@ templates = Jinja2Templates(directory="templates")
 router = APIRouter(prefix=settings.views.prefix_profile, include_in_schema=False)
 
 
-@router.get("/", response_class=HTMLResponse, response_model=None)
+@router.get("/", response_class=HTMLResponse)
 async def profile(
     request: Request,
     user: Annotated[User, Depends(current_active_user_ui)],
@@ -37,5 +37,24 @@ async def profile(
             "user": user,
             "categories": categories,
             "favorites": favorites,
+        },
+    )
+
+
+@router.get("/edit", response_class=HTMLResponse)
+async def edit_profile(
+    request: Request,
+    user: Annotated[User, Depends(current_active_user_ui)],
+    categories: Sequence[Category] = Depends(get_categories),
+):
+    if user is None:
+        return RedirectResponse(url="/auth/login", status_code=status.HTTP_302_FOUND)
+
+    return templates.TemplateResponse(
+        "auth/edit_profile.html",
+        {
+            "request": request,
+            "user": user,
+            "categories": categories,
         },
     )

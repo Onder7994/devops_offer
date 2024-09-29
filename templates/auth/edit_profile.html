@@ -1,0 +1,58 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4">Редактирование профиля</h1>
+
+    <!-- Форма для редактирования профиля -->
+    <form method="POST" action="/profile/edit" class="mx-auto" style="max-width: 600px;">
+        <!-- CSRF-токен, если у вас есть защита от CSRF -->
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+        <!-- Поле для изменения имени пользователя -->
+        <div class="mb-3">
+            <label for="username" class="form-label">Имя пользователя</label>
+            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+        </div>
+
+        <!-- Поле для изменения email -->
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+        </div>
+
+        <!-- Поле для ввода старого пароля -->
+        <div class="mb-3">
+            <label for="current_password" class="form-label">Текущий пароль</label>
+            <input type="password" class="form-control" id="current_password" name="current_password" required>
+        </div>
+
+        <!-- Поле для ввода нового пароля -->
+        <div class="mb-3">
+            <label for="new_password" class="form-label">Новый пароль</label>
+            <input type="password" class="form-control" id="new_password" name="new_password" required>
+        </div>
+
+        <!-- Кнопка для сохранения изменений -->
+        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+    </form>
+
+    <!-- Отображение ошибок -->
+    {% if errors %}
+        <div class="alert alert-danger mt-4">
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <!-- Сообщение об успешном обновлении -->
+    {% if success %}
+        <div class="alert alert-success mt-4">
+            Профиль успешно обновлен!
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

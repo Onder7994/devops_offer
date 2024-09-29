@@ -1,4 +1,4 @@
-from pydantic import EmailStr, BaseModel, constr, field_validator, model_validator
+from pydantic import EmailStr, BaseModel, constr, model_validator
 from fastapi_users import schemas
 
 
@@ -15,7 +15,7 @@ class UserUpdate(schemas.BaseUserUpdate):
 
 
 class RegisterForm(BaseModel):
-    username: str
+    username: constr(min_length=3, max_length=25)
     email: EmailStr
     password: constr(min_length=6)
     password_confirm: constr(min_length=6)
