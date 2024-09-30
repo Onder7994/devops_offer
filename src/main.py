@@ -18,7 +18,9 @@ from src.question.router import router as question_router
 from src.auth.router import router as auth_router
 from src.favorite.router import router as favorite_router
 from src.question.views import router as question_view_router
-from src.auth.views import router as auth_view_router
+from src.auth.views import router as password_reset_view_router
+from src.auth.login.views import router as login_view_router
+from src.auth.register.views import router as register_view_router
 from src.profile.views import router as profile_view_router
 import uvicorn
 from src.config import settings
@@ -76,7 +78,9 @@ api_app.include_router(answer_router)
 front_app.mount("/static", StaticFiles(directory="static"), name="static")
 front_app.include_router(category_view_router)
 front_app.include_router(question_view_router)
-front_app.include_router(auth_view_router)
+front_app.include_router(login_view_router)
+front_app.include_router(register_view_router)
+front_app.include_router(password_reset_view_router)
 front_app.include_router(profile_view_router)
 
 
@@ -105,7 +109,7 @@ async def front_http_exception(
             "categories": categories,
             "user": user,
         },
-        status_code=status.HTTP_404_NOT_FOUND,
+        status_code=exc.status_code,
     )
 
 

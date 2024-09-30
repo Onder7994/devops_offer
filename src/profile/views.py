@@ -3,7 +3,11 @@ from typing import Annotated, List, Sequence
 from fastapi import APIRouter, Depends, Request, status, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from fastapi_users.exceptions import UserAlreadyExists, InvalidPasswordException
+from fastapi_users.exceptions import (
+    UserAlreadyExists,
+    InvalidPasswordException,
+    UserNotExists,
+)
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -103,9 +107,12 @@ async def edit_profile(
         )
 
     if form.email != user.email:
-        is_user_exist = await user_manager.get_by_email(user_email=form.email)
-        if is_user_exist:
-            errors.append("Пользователь с таким email уже существует")
+        try:
+            is_user_exist = await user_manager.get_by_email(user_email=form.email)
+            if is_user_exist:
+                errors.append("Пользователь с таким email уже существует")
+        except UserNotExists:
+            pass
 
     if form.change_password:
         if not verify_password(form.current_password, user.hashed_password):
