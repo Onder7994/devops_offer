@@ -8,12 +8,13 @@ from fastapi_users.exceptions import (
     UserNotExists,
     InvalidResetPasswordToken,
 )
-from pydantic import EmailStr
+from pydantic import ValidationError
 from starlette.responses import RedirectResponse
+
+from src.auth.schemas import ResetPasswordForm
 from src.auth.models import User
-from src.auth.schemas import UserCreate
 from src.category import Category
-from src.auth.fastapi_users import auth_backend_cookie, current_active_user_ui
+from src.auth.fastapi_users import current_active_user_ui
 from src.auth.manager import UserManager
 from src.auth.dependencies import get_user_manager
 from src.config import settings
@@ -49,10 +50,13 @@ async def password_reset(
     request: Request,
     user_manager: Annotated[UserManager, Depends(get_user_manager)],
     categories: Sequence[Category] = Depends(get_categories),
-    email: EmailStr = Form(...),
+    email: str = Form(...),
 ):
     try:
-        user = await user_manager.get_by_email(user_email=email)
+        valid_email = ResetPasswordForm(email=email)
+        user = await user_manager.get_by_email(
+            user_email=valid_email.email,
+        )
 
     except UserNotExists:
         return templates.TemplateResponse(
@@ -60,6 +64,17 @@ async def password_reset(
             {
                 "request": request,
                 "error": "Пользователь не найден",
+                "categories": categories,
+            },
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    except ValidationError:
+        return templates.TemplateResponse(
+            "auth/password_reset.html",
+            {
+                "request": request,
+                "error": "Введен некорректный email",
                 "categories": categories,
             },
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -81,8 +96,12 @@ async def password_reset(
 async def password_reset_confirm(
     request: Request,
     token: str,
+    user: Annotated[User, Depends(current_active_user_ui)],
     categories: Sequence[Category] = Depends(get_categories),
 ):
+    if user:
+        return RedirectResponse(url="/profile", status_code=status.HTTP_302_FOUND)
+
     return templates.TemplateResponse(
         "auth/password_reset_confirm.html",
         {

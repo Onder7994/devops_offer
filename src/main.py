@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from typing import Annotated, Sequence
 
 from fastapi import FastAPI, Request, Depends, status
+from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import ORJSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates

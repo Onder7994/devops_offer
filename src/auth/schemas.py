@@ -26,3 +26,7 @@ class RegisterForm(BaseModel):
         if model.password != model.password_confirm:
             raise ValueError("Пароли не совпадают")
         return model
+
+
+class ResetPasswordForm(BaseModel):
+    email: EmailStr
