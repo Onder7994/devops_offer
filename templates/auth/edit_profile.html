@@ -34,20 +34,29 @@
             <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
         </div>
 
+        <!-- Чекбокс для изменения пароля -->
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="change_password_checkbox" name="change_password" value="1">
+            <label class="form-check-label" for="change_password_checkbox">
+                Изменить пароль
+            </label>
+        </div>
+
         <!-- Поле для ввода старого пароля -->
-        <div class="mb-3">
+        <div class="mb-3 password-fields" style="display: none;">
             <label for="current_password" class="form-label">Текущий пароль</label>
-            <input type="password" class="form-control" id="current_password" name="current_password" required>
+            <input type="password" class="form-control" id="current_password" name="current_password">
         </div>
 
         <!-- Поле для ввода нового пароля -->
-        <div class="mb-3">
+        <div class="mb-3 password-fields" style="display: none;">
             <label for="new_password" class="form-label">Новый пароль</label>
-            <input type="password" class="form-control" id="new_password" name="new_password" required>
+            <input type="password" class="form-control" id="new_password" name="new_password">
         </div>
 
         <!-- Кнопка для сохранения изменений -->
         <button type="submit" class="btn btn-primary">Сохранить изменения</button>
     </form>
 </div>
+<script src="{{ url_for('static', path='js/hide_edit_password.js') }}"></script>
 {% endblock %}

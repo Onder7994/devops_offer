@@ -85,23 +85,28 @@ async def front_http_exception(
     request: Request,
     exc: StarletteHTTPException,
 ):
-    if exc.status_code == 404:
-        session_generator = db_helper.session_getter()
-        session = await anext(session_generator)
-        user = current_active_user_ui
-        try:
-            categories = await get_all_category(session=session)
-        finally:
-            await session_generator.aclose()
-        return templates.TemplateResponse(
-            "404.html",
-            {
-                "request": request,
-                "categories": categories,
-                "user": user,
-            },
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
+    render_html = ""
+    if exc.status_code == status.HTTP_404_NOT_FOUND:
+        render_html = "404.html"
+    if exc.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR:
+        render_html = "500.html"
+
+    session_generator = db_helper.session_getter()
+    session = await anext(session_generator)
+    user = current_active_user_ui
+    try:
+        categories = await get_all_category(session=session)
+    finally:
+        await session_generator.aclose()
+    return templates.TemplateResponse(
+        render_html,
+        {
+            "request": request,
+            "categories": categories,
+            "user": user,
+        },
+        status_code=status.HTTP_404_NOT_FOUND,
+    )
 
 
 @front_app.get("/", response_class=HTMLResponse, include_in_schema=False)

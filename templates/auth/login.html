@@ -9,8 +9,8 @@
         {% endif %}
         <form action="/auth/login" method="post">
             <div class="mb-3">
-                <label for="username" class="form-label">Email</label>
-                <input type="email" class="form-control" id="username" name="username" placeholder="Введите ваш email" required>
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Введите ваш email" required>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Пароль</label>
@@ -21,6 +21,9 @@
             </div>
             <div class="text-center mt-3">
                 <p>Нет аккаунта? <a href="/auth/register" class="text-decoration-none">Регистрация</a></p>
+            </div>
+            <div class="text-center mt-3">
+                <p>Забыли пароль? <a href="/auth/password-reset" class="text-decoration-none">Сбросить пароль</a></p>
             </div>
         </form>
     </div>

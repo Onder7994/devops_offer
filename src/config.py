@@ -65,6 +65,19 @@ class LoggingConfig(BaseModel):
     log_format: str = LOG_DEFAULT_FORMAT
 
 
+class MailConfig(BaseModel):
+    username: str
+    password: str
+    from_mail: str
+    port: int = 587
+    server: str = "smtp.gmail.com"
+    tls: bool = True
+    ssl: bool = False
+    use_credentials: bool = True
+    validate_certs: bool = True
+    from_mail_name: str = "devops_offer"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -77,6 +90,7 @@ class Settings(BaseSettings):
     db: DatabaseConfig
     access_token: AccessTokenConfig
     views: ViewsPrefix = ViewsPrefix()
+    mail: MailConfig
 
 
 settings = Settings()

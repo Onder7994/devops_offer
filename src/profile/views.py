@@ -7,7 +7,7 @@ from fastapi_users.exceptions import UserAlreadyExists, InvalidPasswordException
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.auth.dependencies import get_user_manager
+from src.auth.dependencies import get_user_manager, get_user_by_username
 from src.auth.manager import UserManager
 from src.auth.schemas import UserUpdate
 from .schemas import EditProfileForm
@@ -70,19 +70,22 @@ async def edit_profile_form(
 @router.post("/edit", response_class=HTMLResponse)
 async def edit_profile(
     request: Request,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     user: Annotated[User, Depends(current_active_user_ui)],
     user_manager: Annotated[UserManager, Depends(get_user_manager)],
     categories: Sequence[Category] = Depends(get_categories),
     username: str = Form(...),
     email: str = Form(...),
-    current_password: str = Form(...),
-    new_password: str = Form(...),
+    change_password: bool = Form(False),
+    current_password: str = Form(None),
+    new_password: str = Form(None),
 ):
     errors = []
     try:
         form = EditProfileForm(
             username=username,
             email=email,
+            change_password=change_password,
             current_password=current_password,
             new_password=new_password,
         )
@@ -99,13 +102,21 @@ async def edit_profile(
             status_code=status.HTTP_400_BAD_REQUEST,
         )
 
-    if not verify_password(form.current_password, user.hashed_password):
-        errors.append("Текущий пароль введен неправильно.")
-
     if form.email != user.email:
         is_user_exist = await user_manager.get_by_email(user_email=form.email)
         if is_user_exist:
             errors.append("Пользователь с таким email уже существует")
+
+    if form.change_password:
+        if not verify_password(form.current_password, user.hashed_password):
+            errors.append("Текущий пароль введен неправильно.")
+
+    if form.username != user.username:
+        is_user_exist = await get_user_by_username(
+            username=form.username, session=session
+        )
+        if is_user_exist:
+            errors.append("Пользователь с таким именем уже зарегистрирован")
 
     if errors:
         return templates.TemplateResponse(
@@ -120,11 +131,15 @@ async def edit_profile(
         )
 
     try:
-        user_update = UserUpdate(
-            username=form.username,
-            email=form.email,
-            password=form.new_password,
-        )
+        user_updated_data = {
+            "username": form.username,
+            "email": form.email,
+        }
+
+        if form.change_password and form.new_password:
+            user_updated_data["password"] = form.new_password
+
+        user_update = UserUpdate(**user_updated_data)
         user = await user_manager.update(
             user_update=user_update, user=user, request=request
         )

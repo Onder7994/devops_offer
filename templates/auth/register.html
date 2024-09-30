@@ -4,8 +4,14 @@
 <div class="d-flex justify-content-center">
     <div class="card shadow-sm p-4" style="width: 30rem;">
         <h2 class="text-center mb-4">Регистрация</h2>
-        {% if error %}
-        <div class="alert alert-danger">{{ error }}</div>
+        {% if errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
         {% endif %}
         <form action="/auth/register" method="post">
             <div class="mb-3">
