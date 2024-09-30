@@ -11,7 +11,7 @@ from starlette.responses import RedirectResponse
 
 from src.db.database import db_helper
 from src.auth.dependencies import get_user_by_username
-from src.auth.schemas import RegisterForm
+from src.auth.register.schemas import RegisterForm
 
 from src.auth.models import User
 from src.auth.schemas import UserCreate

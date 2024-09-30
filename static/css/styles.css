@@ -86,3 +86,11 @@ body {
 .list-group-item:hover {
     background-color: #f8f9fa;
 }
+
+.container .alert.notification-box {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+

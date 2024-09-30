@@ -1,0 +1,84 @@
+<!-- templates/admin/panel.html -->
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Админ-панель</h1>
+
+    <!-- Добавление категории -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Добавить категорию</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="/admin/add_category">
+                <div class="mb-3">
+                    <label for="categoryName" class="form-label">Название категории</label>
+                    <input type="text" class="form-control" id="categoryName" name="category_name" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Добавить категорию</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Добавление вопроса и ответа -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Добавить вопрос и ответ</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="/admin/add_question_answer">
+                <div class="mb-3">
+                    <label for="questionCategory" class="form-label">Категория</label>
+                    <select class="form-select" id="questionCategory" name="category_id" required>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="questionText" class="form-label">Вопрос</label>
+                    <input type="text" class="form-control" id="questionText" name="question_text" required>
+                </div>
+                <div class="mb-3">
+                    <label for="answerText" class="form-label">Ответ</label>
+                    <textarea class="form-control" id="answerText" name="answer_text" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Добавить вопрос и ответ</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Таблица категорий, вопросов и ответов -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Список вопросов и ответов</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Категория</th>
+                        <th>Вопрос</th>
+                        <th>Ответ</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in question_answers %}
+                        <tr>
+                            <td>{{ item.category.name }}</td>
+                            <td>{{ item.question }}</td>
+                            <td>{{ item.answer }}</td>
+                            <td>
+                                <a href="/admin/edit/{{ item.id }}" class="btn btn-warning btn-sm">Редактировать</a>
+                                <a href="/admin/delete/{{ item.id }}" class="btn btn-danger btn-sm">Удалить</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

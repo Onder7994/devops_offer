@@ -31,6 +31,8 @@ class ViewsPrefix(BaseModel):
     prefix_question: str = "/view/questions"
     prefix_auth: str = "/auth"
     prefix_profile: str = "/profile"
+    prefix_admin_login: str = "/auth/admin"
+    prefix_admin: str = "/admin"
 
 
 class DatabaseConfig(BaseModel):

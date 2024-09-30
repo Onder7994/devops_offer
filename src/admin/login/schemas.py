@@ -1,24 +1,12 @@
 import re
 
 from pydantic import BaseModel, field_validator
-from fastapi_users import schemas
 from pydantic_core import PydanticCustomError
 
 
-class UserRead(schemas.BaseUser[int]):
-    username: str
-
-
-class UserCreate(schemas.BaseUserCreate):
-    username: str
-
-
-class UserUpdate(schemas.BaseUserUpdate):
-    username: str
-
-
-class ResetPasswordForm(BaseModel):
+class AdminLoginForm(BaseModel):
     email: str
+    password: str
 
     @field_validator("email")
     @classmethod
@@ -29,3 +17,4 @@ class ResetPasswordForm(BaseModel):
                 "email_validate_error",
                 "Некорректный формат email адреса",
             )
+        return value

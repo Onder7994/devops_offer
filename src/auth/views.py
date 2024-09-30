@@ -69,12 +69,13 @@ async def password_reset(
             status_code=status.HTTP_400_BAD_REQUEST,
         )
 
-    except ValidationError:
+    except ValidationError as err:
+        errors_messages = [err["msg"] for err in err.errors()]
         return templates.TemplateResponse(
             "auth/password_reset.html",
             {
                 "request": request,
-                "error": "Введен некорректный email",
+                "errors": errors_messages,
                 "categories": categories,
             },
             status_code=status.HTTP_400_BAD_REQUEST,

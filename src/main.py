@@ -2,7 +2,6 @@ from contextlib import asynccontextmanager
 from typing import Annotated, Sequence
 
 from fastapi import FastAPI, Request, Depends, status
-from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import ORJSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -23,11 +22,11 @@ from src.auth.views import router as password_reset_view_router
 from src.auth.login.views import router as login_view_router
 from src.auth.register.views import router as register_view_router
 from src.profile.views import router as profile_view_router
+from src.admin.views import router as admin_ui_view_router
 import uvicorn
 from src.config import settings
 from src.db.database import db_helper
 from src.common.dependencies import get_categories
-import src.db.models_import
 import logging
 
 logging.basicConfig(format=settings.logging.log_format)
@@ -83,6 +82,7 @@ front_app.include_router(login_view_router)
 front_app.include_router(register_view_router)
 front_app.include_router(password_reset_view_router)
 front_app.include_router(profile_view_router)
+front_app.include_router(admin_ui_view_router)
 
 
 @front_app.exception_handler(StarletteHTTPException)

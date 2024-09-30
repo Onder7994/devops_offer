@@ -43,6 +43,11 @@
                             <a class="nav-link" href="/auth/register">Регистрация</a>
                         </li>
                     {% endif %}
+                    {% if user.is_superuser %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin">Админ</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
