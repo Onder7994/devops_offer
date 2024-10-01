@@ -30,7 +30,7 @@ templates = Jinja2Templates(directory="templates")
 router = APIRouter(prefix=settings.views.prefix_profile, include_in_schema=False)
 
 
-@router.get("/", response_class=HTMLResponse)
+@router.get("", response_class=HTMLResponse)
 async def profile(
     request: Request,
     user: Annotated[User, Depends(current_active_user_ui)],

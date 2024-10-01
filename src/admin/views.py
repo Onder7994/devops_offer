@@ -18,9 +18,7 @@ from src.auth.models import User
 from src.category import Category
 from src.category.dependencies import create_category
 from src.auth.fastapi_users import (
-    auth_backend_cookie,
     current_active_superuser_ui,
-    current_active_user_ui,
 )
 from src.config import settings
 from src.common.dependencies import get_categories, get_all_questions
@@ -30,13 +28,15 @@ templates = Jinja2Templates(directory="templates")
 router = APIRouter(prefix=settings.views.prefix_admin, include_in_schema=False)
 
 
-@router.get("/", response_class=HTMLResponse)
+@router.get("", response_class=HTMLResponse)
 async def admin_ui(
     request: Request,
     superuser: Annotated[User, Depends(current_active_superuser_ui)],
     categories: Sequence[Category] = Depends(get_categories),
     questions: Sequence[Question] = Depends(get_all_questions),
 ):
+    error = request.query_params.get("error")
+    success = request.query_params.get("success")
     if superuser is None:
         return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
 
@@ -47,17 +47,16 @@ async def admin_ui(
             "user": superuser,
             "categories": categories,
             "questions": questions,
+            "category_error": error,
+            "success_category": success,
         },
     )
 
 
 @router.post("/add_category", response_class=HTMLResponse)
 async def admin_add_category(
-    request: Request,
     superuser: Annotated[User, Depends(current_active_superuser_ui)],
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    categories: Sequence[Category] = Depends(get_categories),
-    questions: Sequence[Question] = Depends(get_all_questions),
     category: str = Form(...),
 ):
     if superuser is None:
@@ -68,30 +67,12 @@ async def admin_add_category(
         try:
             await create_category(category_in=category_in, session=session)
         except HTTPException:
-            return templates.TemplateResponse(
-                "admin/admin.html",
-                {
-                    "request": request,
-                    "user": superuser,
-                    "categories": categories,
-                    "success_category": False,
-                    "category_error": "Категория уже существует",
-                    "questions": questions,
-                },
-                status_code=status.HTTP_200_OK,
+            return RedirectResponse(
+                url="/admin?error=Категория уже существует",
+                status_code=status.HTTP_303_SEE_OTHER,
             )
 
-        return templates.TemplateResponse(
-            "admin/admin.html",
-            {
-                "request": request,
-                "user": superuser,
-                "categories": categories,
-                "success_category": True,
-                "questions": questions,
-            },
-            status_code=status.HTTP_200_OK,
-        )
+        return RedirectResponse(url="/admin?success=Категория добавлена")
 
 
 @router.post("/add_question_answer", response_class=HTMLResponse)
