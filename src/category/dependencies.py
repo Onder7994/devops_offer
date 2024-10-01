@@ -50,6 +50,12 @@ async def create_category(
     category_in: CategoryCreate, session: AsyncSession
 ) -> Category:
     slug = slugify(category_in.name)
+    is_category_exist = await get_category_by_slug(slug=slug, session=session)
+    if is_category_exist:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Category already exist",
+        )
     new_category = Category(
         name=category_in.name,
         slug=slug,

@@ -68,15 +68,22 @@ async def get_question_by_slug(slug: str, session: AsyncSession) -> Question | N
 async def create_question(
     question_in: QuestionCreate, session: AsyncSession
 ) -> Question:
+    slug = slugify(question_in.title)
     is_category_exit = await get_category_by_id(
         category_id=question_in.category_id, session=session
     )
+    is_question_exist = await get_question_by_slug(slug=slug, session=session)
+    if is_question_exist:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Question already exist",
+        )
     if is_category_exit is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Category not found.",
         )
-    slug = slugify(question_in.title)
+
     new_question = Question(
         title=question_in.title,
         category_id=question_in.category_id,

@@ -6,6 +6,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import ORJSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import RedirectResponse
 
 from src.category.dependencies import get_all_category
 from src.auth.fastapi_users import current_active_user_ui
@@ -92,9 +93,11 @@ async def front_http_exception(
 ):
     render_html = ""
     if exc.status_code == status.HTTP_404_NOT_FOUND:
-        render_html = "404.html"
+        render_html = "errors/404.html"
     if exc.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR:
-        render_html = "500.html"
+        render_html = "errors/500.html"
+    if exc.status_code == status.HTTP_405_METHOD_NOT_ALLOWED:
+        return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
     session_generator = db_helper.session_getter()
     session = await anext(session_generator)
@@ -114,7 +117,7 @@ async def front_http_exception(
     )
 
 
-@front_app.get("/", response_class=HTMLResponse, include_in_schema=False)
+@front_app.get("/", response_class=HTMLResponse)
 async def home(
     request: Request,
     categories: Annotated[Sequence[Category], Depends(get_categories)],

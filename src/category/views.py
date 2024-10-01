@@ -19,7 +19,6 @@ templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(
     prefix=settings.views.prefix_category,
-    include_in_schema=False,
 )
 
 

@@ -18,6 +18,6 @@ class CategoryUpdate(CategoryBase):
 class CategoryRead(CategoryBase):
     id: int
     name: str
-    description: str
+    description: str | None
     slug: str
     model_config = ConfigDict(from_attributes=True)
