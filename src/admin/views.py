@@ -7,6 +7,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import RedirectResponse
 
+from src.category.dependencies import delete_category_by_id
 from src.question.models import Question
 from src.question.schemas import QuestionCreate
 from src.question.dependencies import create_question, delete_question_by_id
@@ -35,8 +36,7 @@ async def admin_ui(
     categories: Sequence[Category] = Depends(get_categories),
     questions: Sequence[Question] = Depends(get_all_questions),
 ):
-    error = request.query_params.get("error")
-    success = request.query_params.get("success")
+
     if superuser is None:
         return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
 
@@ -47,16 +47,17 @@ async def admin_ui(
             "user": superuser,
             "categories": categories,
             "questions": questions,
-            "category_error": error,
-            "success_category": success,
         },
     )
 
 
 @router.post("/add_category", response_class=HTMLResponse)
 async def admin_add_category(
+    request: Request,
     superuser: Annotated[User, Depends(current_active_superuser_ui)],
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    questions: Sequence[Question] = Depends(get_all_questions),
+    categories: Sequence[Category] = Depends(get_categories),
     category: str = Form(...),
 ):
     if superuser is None:
@@ -67,12 +68,30 @@ async def admin_add_category(
         try:
             await create_category(category_in=category_in, session=session)
         except HTTPException:
-            return RedirectResponse(
-                url="/admin?error=Категория уже существует",
-                status_code=status.HTTP_303_SEE_OTHER,
+            return templates.TemplateResponse(
+                "admin/admin.html",
+                {
+                    "request": request,
+                    "user": superuser,
+                    "categories": categories,
+                    "success_category": False,
+                    "category_error": "Категория уже существует",
+                    "questions": questions,
+                },
+                status_code=status.HTTP_200_OK,
             )
 
-        return RedirectResponse(url="/admin?success=Категория добавлена")
+        return templates.TemplateResponse(
+            "admin/admin.html",
+            {
+                "request": request,
+                "user": superuser,
+                "categories": categories,
+                "success_category": True,
+                "questions": questions,
+            },
+            status_code=status.HTTP_200_OK,
+        )
 
 
 @router.post("/add_question_answer", response_class=HTMLResponse)
@@ -136,15 +155,29 @@ async def admin_add_question_answer(
 
 @router.get("/delete_question/{question_id}")
 async def delete_question(
-    request: Request,
     question_id: int,
     superuser: Annotated[User, Depends(current_active_superuser_ui)],
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    categories: Sequence[Category] = Depends(get_categories),
-    questions: Sequence[Question] = Depends(get_all_questions),
 ):
     if superuser is None:
         return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    try:
+        await delete_question_by_id(question_id=question_id, session=session)
+    except HTTPException:
+        return RedirectResponse(url="/admin", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(url="/admin", status_code=status.HTTP_302_FOUND)
 
-    await delete_question_by_id(question_id=question_id, session=session)
+
+@router.get("/delete_category/{category_id}")
+async def delete_category(
+    category_id: int,
+    superuser: Annotated[User, Depends(current_active_superuser_ui)],
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+):
+    if superuser is None:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    try:
+        await delete_category_by_id(category_id=category_id, session=session)
+    except HTTPException:
+        return RedirectResponse(url="/admin", status_code=status.HTTP_303_SEE_OTHER)
     return RedirectResponse(url="/admin", status_code=status.HTTP_302_FOUND)

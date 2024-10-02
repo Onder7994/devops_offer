@@ -4,6 +4,8 @@ from slugify import slugify
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
+from src.favorite.models import Favorite
 from src.category.dependencies import get_category_by_id
 from src.question.schemas import QuestionRead, QuestionCreate, QuestionUpdate
 from fastapi import HTTPException, status
@@ -133,6 +135,13 @@ async def delete_question_by_id(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Question not found.",
+        )
+    stmt = select(Favorite).where(Favorite.question_id == question_id)
+    is_depends_on_favorites = await session.scalars(stmt)
+    if is_depends_on_favorites:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Question depends on favorites",
         )
     await session.delete(question)
     await session.commit()
