@@ -21,7 +21,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[QuestionRead])
+@router.get("", response_model=list[QuestionRead])
 async def get_questions(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
 ):
@@ -38,7 +38,7 @@ async def get_question(
     return question
 
 
-@router.post("/", response_model=QuestionRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=QuestionRead, status_code=status.HTTP_201_CREATED)
 async def create_new_question(
     question_in: QuestionCreate,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],

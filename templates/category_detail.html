@@ -13,15 +13,11 @@
                     <h5 class="card-title">{{ question.title }}</h5>
                     <p class="card-text text-muted">Категория: {{ category.name }}</p>
                     <a href="/view/questions/{{ question.slug }}" class="btn btn-primary">Подробнее</a>
-                    {% if user %}
-                    <button class="btn btn-outline-warning mt-2 add-to-favorites" data-question-id="{{ question.id }}">
-                        <i class="fa fa-star"></i> В избранное
-                    </button>
-                    {% endif %}
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
+    {% include "layouts/pagination.html" %}
 </div>
 {% endblock %}

@@ -1,7 +1,7 @@
 from typing import Sequence, List
 
 from slugify import slugify
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -80,11 +80,33 @@ async def update_category(
 
 
 async def get_questions_by_category_id(
-    category_id: int, session: AsyncSession
+    category_id: int,
+    session: AsyncSession,
+    offset: int = 0,
+    limit: int = 9,
 ) -> Sequence[Question]:
-    stmt = select(Question).where(Question.category_id == category_id)
+    stmt = (
+        select(Question)
+        .where(Question.category_id == category_id)
+        .offset(offset)
+        .limit(limit)
+    )
     result = await session.scalars(stmt)
     return result.all()
+
+
+async def get_questions_count_by_category_id(
+    category_id: int,
+    session: AsyncSession,
+) -> int:
+    stmt = (
+        select(func.count())
+        .select_from(Question)
+        .where(Question.category_id == category_id)
+    )
+    result = await session.execute(stmt)
+    total = result.scalar_one()
+    return total
 
 
 async def delete_category_by_id(category_id: int, session: AsyncSession):
