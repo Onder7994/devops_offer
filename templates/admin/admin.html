@@ -2,132 +2,157 @@
 {% extends 'layouts/base.html' %}
 
 {% block content %}
+{% set current_section = section or 'categories' %}
 <div class="container mt-4">
     <h1>Админ-панель</h1>
-
-    <!-- Добавление категории -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5>Добавить категорию</h5>
-        </div>
-        <div class="card-body">
-            {% if category_error %}
-            <div class="alert alert-danger">{{ category_error }}</div>
-            {% endif %}
-            {% if success_category %}
-            <div class="alert alert-success notification-box">
-                Категория добавлена
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="?section=categories" class="list-group-item list-group-item-action {% if current_section == 'categories' %}active{% endif %}" id="category-link">Категории</a>
+                <a href="?section=questions" class="list-group-item list-group-item-action {% if current_section == 'questions' %}active{% endif %}" id="question-link">Вопросы и Ответы</a>
             </div>
-            {% endif %}
-            <form method="POST" action="/admin/add_category">
-                <div class="mb-3">
-                    <label for="category" class="form-label">Название категории</label>
-                    <input type="text" class="form-control" id="category" name="category" required>
+        </div>
+
+        <!-- Content Area -->
+        <div class="col-md-9">
+            <div id="content-section">
+                <!-- Раздел категорий -->
+                <div id="categories-section" {% if current_section != 'categories' %}style="display: none;"{% endif %}>
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Добавить категорию</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if category_error %}
+                            <div class="alert alert-danger">{{ category_error }}</div>
+                            {% endif %}
+                            {% if success_category %}
+                            <div class="alert alert-success notification-box">
+                                Категория добавлена
+                            </div>
+                            {% endif %}
+                            <form method="POST" action="/admin/add_category">
+                                <div class="mb-3">
+                                    <label for="category" class="form-label">Название категории</label>
+                                    <input type="text" class="form-control" id="category" name="category" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Добавить категорию</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Таблица категорий -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Список категорий</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Категория</th>
+                                        <th>Описание</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for category in categories_pagination %}
+                                        <tr>
+                                            <td>{{ category.name }}</td>
+                                            <td>{{ category.description }}</td>
+                                            <td>
+                                                <a href="/admin/edit/{{ category.id }}" class="btn btn-warning btn-sm">Редактировать</a>
+                                                <a href="/admin/delete_category/{{ category.id }}" class="btn btn-danger btn-sm">Удалить</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% with page=page, page_size=page_size, total_pages=total_pages_categories, section='categories' %}
+                                {% include "layouts/pagination.html" %}
+                            {% endwith %}
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Добавить категорию</button>
-            </form>
-        </div>
-    </div>
 
-    <!-- Таблица категорий -->
-    <div class="card">
-        <div class="card-header">
-            <h5>Список категорий</h5>
-        </div>
-        <div class="card-body">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>Категория</th>
-                        <th>Описание</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for category in categories_pagination %}
-                        <tr>
-                            <td>{{ category.name }}</td>
-                            <td>{{ category.description }}</td>
-                            <td>
-                                <a href="/admin/edit/{{ category.id }}" class="btn btn-warning btn-sm">Редактировать</a>
-                                <a href="/admin/delete_category/{{ category.id }}" class="btn btn-danger btn-sm">Удалить</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% with page=page, page_size=page_size, total_pages=total_pages_categories %}
-                {% include "layouts/pagination.html" %}
-            {% endwith %}
-        </div>
-    </div>
+                <!-- Раздел вопросов -->
+                <div id="questions-section" {% if current_section != 'questions' %}style="display: none;"{% endif %}>
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>Добавить вопрос и ответ</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if question_answer_error %}
+                            <div class="alert alert-danger">{{ question_answer_error }}</div>
+                            {% endif %}
+                            {% if success_question_answer %}
+                            <div class="alert alert-success notification-box">
+                                Вопрос и ответ добавлены
+                            </div>
+                            {% endif %}
+                            <form method="POST" action="/admin/add_question_answer">
+                                <div class="mb-3">
+                                    <label for="category_id" class="form-label">Категория</label>
+                                    <select class="form-select" id="category_id" name="category_id" required>
+                                        {% for category in categories %}
+                                            <option value="{{ category.id }}">{{ category.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="question" class="form-label">Вопрос</label>
+                                    <input type="text" class="form-control" id="question" name="question" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="answer" class="form-label">Ответ</label>
+                                    <textarea class="form-control" id="answer" name="answer" rows="4" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Добавить вопрос и ответ</button>
+                            </form>
+                        </div>
+                    </div>
 
-    <!-- Добавление вопроса и ответа -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5>Добавить вопрос и ответ</h5>
-        </div>
-        <div class="card-body">
-            {% if question_answer_error %}
-            <div class="alert alert-danger">{{ question_answer_error }}</div>
-            {% endif %}
-            {% if success_question_answer %}
-            <div class="alert alert-success notification-box">
-                Вопрос и ответ добавлены
+                    <!-- Таблица вопросов и ответов -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Список вопросов и ответов</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Категория</th>
+                                        <th>Вопрос</th>
+                                        <th>Ответ</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in questions_pagination %}
+                                        <tr>
+                                            <td>{{ item.category.name }}</td>
+                                            <td>{{ item.title }}</td>
+                                            <td>{{ item.answer.content }}</td>
+                                            <td>
+                                                <a href="/admin/edit/{{ item.id }}" class="btn btn-warning btn-sm">Редактировать</a>
+                                                <a href="/admin/delete_question/{{ item.id }}" class="btn btn-danger btn-sm">Удалить</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% with page=page, page_size=page_size, total_pages=total_pages_questions, section='questions' %}
+                                {% include "layouts/pagination.html" %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
             </div>
-            {% endif %}
-            <form method="POST" action="/admin/add_question_answer">
-                <div class="mb-3">
-                    <label for="category_id" class="form-label">Категория</label>
-                    <select class="form-select" id="category_id" name="category_id" required>
-                        {% for category in categories %}
-                            <option value="{{ category.id }}">{{ category.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="question" class="form-label">Вопрос</label>
-                    <input type="text" class="form-control" id="question" name="question" required>
-                </div>
-                <div class="mb-3">
-                    <label for="answer" class="form-label">Ответ</label>
-                    <textarea class="form-control" id="answer" name="answer" rows="4" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Добавить вопрос и ответ</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Таблица категорий, вопросов и ответов -->
-    <div class="card">
-        <div class="card-header">
-            <h5>Список вопросов и ответов</h5>
-        </div>
-        <div class="card-body">
-            <table class="table table-bordered table-hover">
-                <thead>
-                    <tr>
-                        <th>Категория</th>
-                        <th>Вопрос</th>
-                        <th>Ответ</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in questions %}
-                        <tr>
-                            <td>{{ item.category.name }}</td>
-                            <td>{{ item.title }}</td>
-                            <td>{{ item.answer.content }}</td>
-                            <td>
-                                <a href="/admin/edit/{{ item.id }}" class="btn btn-warning btn-sm">Редактировать</a>
-                                <a href="/admin/delete_question/{{ item.id }}" class="btn btn-danger btn-sm">Удалить</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
         </div>
     </div>
 </div>
+
+<!-- Подключение вашего JavaScript -->
+<script src="{{ url_for('static', path='js/sidebar_switch.js') }}"></script>
 {% endblock %}

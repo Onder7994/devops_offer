@@ -3,7 +3,11 @@
   <ul class="pagination justify-content-center">
     {% if page > 1 %}
     <li class="page-item">
-      <a class="page-link" href="?page={{ page - 1 }}&page_size={{ page_size }}" aria-label="Previous">
+      {% set query_params = 'page=' ~ (page - 1) ~ '&page_size=' ~ page_size %}
+      {% if section %}
+        {% set query_params = query_params ~ '&section=' ~ section %}
+      {% endif %}
+      <a class="page-link" href="?{{ query_params }}" aria-label="Previous">
         <span aria-hidden="true">&laquo;</span>
       </a>
     </li>
@@ -15,13 +19,21 @@
 
     {% for p in range(1, total_pages + 1) %}
     <li class="page-item {% if p == page %}active{% endif %}">
-      <a class="page-link" href="?page={{ p }}&page_size={{ page_size }}">{{ p }}</a>
+      {% set query_params = 'page=' ~ p ~ '&page_size=' ~ page_size %}
+      {% if section %}
+        {% set query_params = query_params ~ '&section=' ~ section %}
+      {% endif %}
+      <a class="page-link" href="?{{ query_params }}">{{ p }}</a>
     </li>
     {% endfor %}
 
     {% if page < total_pages %}
     <li class="page-item">
-      <a class="page-link" href="?page={{ page + 1 }}&page_size={{ page_size }}" aria-label="Next">
+      {% set query_params = 'page=' ~ (page + 1) ~ '&page_size=' ~ page_size %}
+      {% if section %}
+        {% set query_params = query_params ~ '&section=' ~ section %}
+      {% endif %}
+      <a class="page-link" href="?{{ query_params }}" aria-label="Next">
         <span aria-hidden="true">&raquo;</span>
       </a>
     </li>

@@ -47,6 +47,7 @@ async def admin_ui(
     questions: Sequence[Question] = Depends(get_all_questions),
     page: str | None = Query(None),
     page_size: str | None = Query(None),
+    section: str = Query("categories"),
 ):
 
     if superuser is None:
@@ -92,6 +93,9 @@ async def admin_ui(
             "page": query_params.page,
             "page_size": query_params.page_size,
             "total_pages_categories": total_pages_categories,
+            "questions_pagination": questions_pagination,
+            "total_pages_questions": total_pages_questions,
+            "section": section,
         },
     )
 
