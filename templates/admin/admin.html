@@ -44,7 +44,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for category in categories %}
+                    {% for category in categories_pagination %}
                         <tr>
                             <td>{{ category.name }}</td>
                             <td>{{ category.description }}</td>
@@ -56,6 +56,9 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% with page=page, page_size=page_size, total_pages=total_pages_categories %}
+                {% include "layouts/pagination.html" %}
+            {% endwith %}
         </div>
     </div>
 

@@ -17,6 +17,21 @@ async def get_all_category(session: AsyncSession) -> Sequence[Category]:
     return result.all()
 
 
+async def get_all_category_with_pagination(
+    session: AsyncSession, page: int = 1, limit: int = 9
+) -> Sequence[Category]:
+    offset = (page - 1) * limit
+    stmt = select(Category).order_by(Category.id).offset(offset).limit(limit)
+    result = await session.scalars(stmt)
+    return result.all()
+
+
+async def get_total_category_count(session: AsyncSession):
+    stmt = select(func.count(Category.id))
+    result = await session.execute(stmt)
+    return result.scalar()
+
+
 async def get_category_by_id(
     category_id: int, session: AsyncSession
 ) -> Category | None:

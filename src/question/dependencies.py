@@ -1,7 +1,7 @@
 from typing import Sequence
 
 from slugify import slugify
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -21,6 +21,21 @@ async def get_all_question(session: AsyncSession) -> Sequence[Question]:
     )
     result = await session.scalars(stmt)
     return result.all()
+
+
+async def get_all_questions_with_pagination(
+    session: AsyncSession, page: int = 1, limit: int = 9
+) -> Sequence[Question]:
+    offset = (page - 1) * limit
+    stmt = select(Question).order_by(Question.id).offset(offset).limit(limit)
+    result = await session.scalars(stmt)
+    return result.all()
+
+
+async def get_total_questions_count(session: AsyncSession):
+    stmt = select(func.count(Question.id))
+    result = await session.execute(stmt)
+    return result.scalar()
 
 
 async def get_question_by_id(

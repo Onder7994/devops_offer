@@ -1,12 +1,21 @@
 from typing import Annotated, Sequence
 
 from fastapi.exceptions import HTTPException
-from fastapi import APIRouter, Request, Depends, status, Form
+from fastapi import APIRouter, Request, Depends, status, Form, Query
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import RedirectResponse
-
+from src.category.dependencies import (
+    get_all_category_with_pagination,
+    get_total_category_count,
+)
+from src.question.dependencies import (
+    get_total_questions_count,
+    get_all_questions_with_pagination,
+)
+from src.common.schemas import PaginationQuery
 from src.category.dependencies import delete_category_by_id
 from src.question.models import Question
 from src.question.schemas import QuestionCreate
@@ -32,13 +41,45 @@ router = APIRouter(prefix=settings.views.prefix_admin, include_in_schema=False)
 @router.get("", response_class=HTMLResponse)
 async def admin_ui(
     request: Request,
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     superuser: Annotated[User, Depends(current_active_superuser_ui)],
     categories: Sequence[Category] = Depends(get_categories),
     questions: Sequence[Question] = Depends(get_all_questions),
+    page: str | None = Query(None),
+    page_size: str | None = Query(None),
 ):
 
     if superuser is None:
         return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+
+    query_params: PaginationQuery = PaginationQuery()
+    try:
+        query_params = PaginationQuery(
+            page=page,
+            page_size=page_size,
+        )
+    except ValidationError:
+        query_params.page = 1
+        query_params.page_size = 9
+
+    categories_pagination = await get_all_category_with_pagination(
+        session=session, page=query_params.page, limit=query_params.page_size
+    )
+    questions_pagination = await get_all_questions_with_pagination(
+        session=session,
+        page=query_params.page,
+        limit=query_params.page_size,
+    )
+    total_categories = await get_total_category_count(session=session)
+    total_questions = await get_total_questions_count(session=session)
+
+    total_pages_categories = (
+        total_categories + query_params.page_size - 1
+    ) // query_params.page_size
+
+    total_pages_questions = (
+        total_questions + query_params.page_size - 1
+    ) // query_params.page_size
 
     return templates.TemplateResponse(
         "admin/admin.html",
@@ -47,6 +88,10 @@ async def admin_ui(
             "user": superuser,
             "categories": categories,
             "questions": questions,
+            "categories_pagination": categories_pagination,
+            "page": query_params.page,
+            "page_size": query_params.page_size,
+            "total_pages_categories": total_pages_categories,
         },
     )
 
