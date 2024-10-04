@@ -106,7 +106,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="answer" class="form-label">Ответ</label>
-                                    <textarea class="form-control" id="answer" name="answer" rows="4" required></textarea>
+                                    <textarea class="form-control" id="answer" name="answer" rows="4"></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Добавить вопрос и ответ</button>
                             </form>
@@ -155,6 +155,6 @@
 
 <!-- Подключение вашего JavaScript -->
 <script src="{{ url_for('static', path='js/sidebar_switch.js') }}"></script>
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="{{ url_for('static', path='js/tinymce/tinymce.min.js') }}" referrerpolicy="origin"></script>
 <script src="{{ url_for('static', path='js/include_tinymce.js') }}"></script>
 {% endblock %}
