@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class Favorite(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"))
+    question_id: Mapped[int] = mapped_column(ForeignKey("questions.id"), unique=True)
 
     user: Mapped["User"] = relationship("User", back_populates="favorites")
     question: Mapped["Question"] = relationship("Question")

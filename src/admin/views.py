@@ -48,6 +48,10 @@ async def admin_ui(
     page: str | None = Query(None),
     page_size: str | None = Query(None),
     section: str = Query("categories"),
+    success_category: str = Query(None),
+    category_error: str = Query(None),
+    success_question_answer: str = Query(None),
+    question_answer_error: str = Query(None),
 ):
 
     if superuser is None:
@@ -96,17 +100,18 @@ async def admin_ui(
             "questions_pagination": questions_pagination,
             "total_pages_questions": total_pages_questions,
             "section": section,
+            "success_category": success_category,
+            "category_error": category_error,
+            "success_question_answer": success_question_answer,
+            "question_answer_error": question_answer_error,
         },
     )
 
 
-@router.post("/add_category", response_class=HTMLResponse)
+@router.post("/add_category", response_class=RedirectResponse)
 async def admin_add_category(
-    request: Request,
     superuser: Annotated[User, Depends(current_active_superuser_ui)],
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    questions: Sequence[Question] = Depends(get_all_questions),
-    categories: Sequence[Category] = Depends(get_categories),
     category: str = Form(...),
 ):
     if superuser is None:
@@ -116,44 +121,28 @@ async def admin_add_category(
         category_in = CategoryCreate(name=category)
         try:
             await create_category(category_in=category_in, session=session)
+            return RedirectResponse(
+                url="/admin?section=categories&success_category=1",
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
         except HTTPException:
-            return templates.TemplateResponse(
-                "admin/admin.html",
-                {
-                    "request": request,
-                    "user": superuser,
-                    "categories": categories,
-                    "success_category": False,
-                    "category_error": "Категория уже существует",
-                    "questions": questions,
-                },
-                status_code=status.HTTP_200_OK,
+            return RedirectResponse(
+                url="/admin?section=categories&category_error=Категория уже существует",
+                status_code=status.HTTP_303_SEE_OTHER,
             )
 
-        return templates.TemplateResponse(
-            "admin/admin.html",
-            {
-                "request": request,
-                "user": superuser,
-                "categories": categories,
-                "success_category": True,
-                "questions": questions,
-            },
-            status_code=status.HTTP_200_OK,
-        )
 
-
-@router.post("/add_question_answer", response_class=HTMLResponse)
+@router.post("/add_question_answer", response_class=RedirectResponse)
 async def admin_add_question_answer(
-    request: Request,
     superuser: Annotated[User, Depends(current_active_superuser_ui)],
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    categories: Sequence[Category] = Depends(get_categories),
-    questions: Sequence[Question] = Depends(get_all_questions),
     category_id: str = Form(...),
     question: str = Form(...),
     answer: str = Form(...),
 ):
+    if superuser is None:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+
     question_in = QuestionCreate(
         title=question,
         category_id=category_id,
@@ -161,16 +150,9 @@ async def admin_add_question_answer(
     try:
         new_question = await create_question(question_in=question_in, session=session)
     except HTTPException:
-        return templates.TemplateResponse(
-            "admin/admin.html",
-            {
-                "request": request,
-                "user": superuser,
-                "categories": categories,
-                "question_answer_error": "Вопрос уже существует",
-                "questions": questions,
-            },
-            status_code=status.HTTP_200_OK,
+        return RedirectResponse(
+            url="/admin?section=questions&question_answer_error=Вопрос уже существует",
+            status_code=status.HTTP_303_SEE_OTHER,
         )
     try:
         answer_in = AnswerCreate(
@@ -179,26 +161,13 @@ async def admin_add_question_answer(
         )
         await create_answer(answer_in=answer_in, session=session)
     except HTTPException:
-        return templates.TemplateResponse(
-            "admin/admin.html",
-            {
-                "request": request,
-                "user": superuser,
-                "categories": categories,
-                "question_answer_error": "Ответ уже существует",
-                "questions": questions,
-            },
-            status_code=status.HTTP_200_OK,
+        return RedirectResponse(
+            url="/admin?section=questions&question_answer_error=Ответ уже существует",
+            status_code=status.HTTP_303_SEE_OTHER,
         )
-    return templates.TemplateResponse(
-        "admin/admin.html",
-        {
-            "request": request,
-            "user": superuser,
-            "categories": categories,
-            "success_question_answer": True,
-            "questions": questions,
-        },
+    return RedirectResponse(
+        url="/admin?section=questions&success_question_answer=1",
+        status_code=status.HTTP_303_SEE_OTHER,
     )
 
 

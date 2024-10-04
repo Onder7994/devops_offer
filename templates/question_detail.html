@@ -4,7 +4,12 @@
 <div class="container">
     <h1 class="text-center my-4">Вопрос: {{ question.title }}</h1>
     <p>Категория: <a href="/view/categories/{{ question.category.id }}" class="text-decoration-none">{{ question.category.name }}</a></p>
-
+    {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    {% if success %}
+    <div class="alert alert-success notification-box">{{ success }}</div>
+    {% endif %}
     {% if question.answer %}
         <div class="card my-4">
             <div class="card-body">
@@ -17,9 +22,17 @@
             Ответ еще не добавлен.
         </div>
     {% endif %}
-    <button class="btn btn-outline-warning add-to-favorites" data-question-id="{{ question.id }}">
-        <i class="fa fa-star"></i> В избранное
-    </button>
+    <form method="post" action="{{ url_for('add_to_favorites') }}">
+        <input type="hidden" name="question_id" value="{{ question.id }}">
+        <button type="submit" class="btn btn-outline-warning" {% if question.id in favorite_question_ids %}disabled{% endif %}>
+            <i class="fa fa-star"></i>
+            {% if question.id in favorite_question_ids %}
+            В избранном
+            {% else %}
+            В избранное
+            {% endif %}
+        </button>
+    </form>
 </div>
 {% endblock %}
 

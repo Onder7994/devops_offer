@@ -1,10 +1,9 @@
 from typing import Annotated, List, Sequence
 
-from fastapi import APIRouter, Depends, Request, status, Form
+from fastapi import APIRouter, Depends, Request, status, Form, HTTPException, Path
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi_users.exceptions import (
-    UserAlreadyExists,
     InvalidPasswordException,
     UserNotExists,
 )
@@ -21,7 +20,7 @@ from src.config import settings
 from src.auth.fastapi_users import current_active_user_ui
 from src.auth.models import User
 from src.db.database import db_helper
-from src.favorite.dependencies import get_user_favorites
+from src.favorite.dependencies import get_user_favorites, remove_favorite
 from starlette.responses import RedirectResponse
 from src.utils.utils import get_hashed_password, verify_password
 
@@ -187,3 +186,22 @@ async def edit_profile(
         },
         status_code=status.HTTP_200_OK,
     )
+
+
+@router.get("/delete_favorite/{favorite_id}")
+async def delete_from_favorite(
+    user: Annotated[User, Depends(current_active_user_ui)],
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    favorite_id: str = Path(...),
+):
+    if user is None:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    try:
+        favorite_id_int = int(favorite_id)
+    except ValueError:
+        return RedirectResponse("/profile", status_code=status.HTTP_302_FOUND)
+    try:
+        await remove_favorite(favorite_id=favorite_id_int, session=session, user=user)
+    except (HTTPException, ValidationError):
+        return RedirectResponse("/profile", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse("/profile", status_code=status.HTTP_302_FOUND)
