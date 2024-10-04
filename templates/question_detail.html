@@ -14,7 +14,7 @@
         <div class="card my-4">
             <div class="card-body">
                 <h2 class="card-title">Ответ:</h2>
-                <p class="card-text">{{ question.answer.content }}</p>
+                <p class="card-text">{{ question.answer.content | safe }}</p>
             </div>
         </div>
     {% else %}
