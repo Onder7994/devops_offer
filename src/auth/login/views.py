@@ -1,6 +1,6 @@
 from typing import Annotated, Sequence
 
-from fastapi import APIRouter, Request, Depends, status, Form
+from fastapi import APIRouter, Request, Depends, status, Form, Cookie
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -15,6 +15,7 @@ from src.auth.manager import UserManager
 from src.auth.dependencies import get_user_manager
 from src.config import settings
 from src.common.dependencies import get_categories
+from src.common.csrf import generate_csrf_token, validate_csrf_token
 
 
 templates = Jinja2Templates(directory="templates")
@@ -31,14 +32,25 @@ async def login_form(
     if user:
         return RedirectResponse(url="/profile", status_code=status.HTTP_302_FOUND)
 
-    return templates.TemplateResponse(
+    csrf_token_value = generate_csrf_token(request)
+
+    response = templates.TemplateResponse(
         "auth/login.html",
         {
             "request": request,
             "categories": categories,
             "user": user,
+            "csrf_token_value": csrf_token_value,
         },
     )
+    response.set_cookie(
+        key=settings.csrf.token_name,
+        value=csrf_token_value,
+        httponly=True,
+        samesite="lax",
+        path="/",
+    )
+    return response
 
 
 @router.get("/logout", response_class=RedirectResponse)
@@ -69,8 +81,25 @@ async def login(
     user_manager: Annotated[UserManager, Depends(get_user_manager)],
     email: str = Form(...),
     password: str = Form(...),
+    csrf_token: str = Form(...),
+    csrf_token_cookie: str = Cookie(None, alias=settings.csrf.token_name),
     categories: Sequence[Category] = Depends(get_categories),
 ):
+    if (
+        not csrf_token_cookie
+        or not validate_csrf_token(request, csrf_token_cookie)
+        or csrf_token != csrf_token_cookie
+    ):
+        return templates.TemplateResponse(
+            "auth/login.html",
+            {
+                "request": request,
+                "error": "Недействительный CSRF-токен",
+                "categories": categories,
+            },
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
     try:
         user = await user_manager.authenticate(
             credentials=OAuth2PasswordRequestForm(
@@ -86,6 +115,7 @@ async def login(
                     "request": request,
                     "error": "Неверный email или пароль",
                     "categories": categories,
+                    "csrf_token_value": csrf_token,
                 },
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
@@ -96,6 +126,7 @@ async def login(
                 "request": request,
                 "error": "Неверный email или пароль",
                 "categories": categories,
+                "csrf_token_value": csrf_token,
             },
             status_code=status.HTTP_400_BAD_REQUEST,
         )
@@ -114,5 +145,9 @@ async def login(
         secure=auth_backend_cookie.transport.cookie_secure,
         httponly=auth_backend_cookie.transport.cookie_httponly,
         samesite=auth_backend_cookie.transport.cookie_samesite,
+    )
+    response.delete_cookie(
+        key=settings.csrf.token_name,
+        path="/",
     )
     return response

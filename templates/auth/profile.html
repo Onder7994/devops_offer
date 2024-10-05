@@ -14,7 +14,6 @@
                 <div class="card-body text-center">
                     <p><strong>Email:</strong> {{ user.email }}</p>
                     <p><strong>Username:</strong> {{ user.username }}</p>
-                    <p><strong>Верифицирован:</strong> {{ user.is_verified }}</p>
                     <a href="/profile/edit" class="btn btn-outline-primary mt-3">
                         <i class="bi bi-pencil"></i> Редактировать профиль
                     </a>
@@ -27,7 +26,7 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-success text-white text-center">
                     <h2 class="mb-0">
-                        <i class="bi bi-heart"></i> Избранные категории
+                        <i class="bi bi-heart"></i> Избранное
                     </h2>
                 </div>
                 <div class="card-body">
@@ -36,11 +35,11 @@
                             {% for favorite in favorites %}
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
-                                        <a href="/view/categories/{{ favorite.question.category.slug }}" class="text-decoration-none">
+                                        <a href="/categories/{{ favorite.question.category.slug }}" class="text-decoration-none">
                                             {{ favorite.question.category.name }}
                                         </a>
                                         <span class="text-muted"> - </span>
-                                        <a href="/view/questions/{{ favorite.question.slug }}" class="text-decoration-none">
+                                        <a href="/questions/{{ favorite.question.slug }}" class="text-decoration-none">
                                             {{ favorite.question.title }}
                                         </a>
                                     </div>
@@ -53,6 +52,9 @@
                     {% else %}
                         <p class="text-muted">У вас пока нет избранных категорий.</p>
                     {% endif %}
+                    {% with page=page, page_size=page_size, total_pages=total_pages_favorites %}
+                        {% include "layouts/pagination.html" %}
+                    {% endwith %}
                 </div>
             </div>
         </div>

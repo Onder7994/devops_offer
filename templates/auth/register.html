@@ -13,7 +13,7 @@
             </ul>
         </div>
         {% endif %}
-        <form action="/auth/register" method="post">
+        <form action="/register" method="post">
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
                 <input type="username" class="form-control" id="username" name="username" placeholder="Введите имя пользователя" required>
@@ -34,7 +34,7 @@
                 <button type="submit" class="btn btn-success">Зарегистрироваться</button>
             </div>
             <div class="text-center mt-3">
-                <p>Уже есть аккаунт? <a href="/auth/login" class="text-decoration-none">Войти</a></p>
+                <p>Уже есть аккаунт? <a href="/login" class="text-decoration-none">Войти</a></p>
             </div>
         </form>
     </div>

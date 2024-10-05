@@ -27,12 +27,16 @@ class ApiPrefix(BaseModel):
 
 
 class ViewsPrefix(BaseModel):
-    prefix_category: str = "/view/categories"
-    prefix_question: str = "/view/questions"
-    prefix_auth: str = "/auth"
+    prefix_category: str = "/categories"
+    prefix_question: str = "/questions"
+    prefix_auth: str = ""
     prefix_profile: str = "/profile"
-    prefix_admin_login: str = "/auth/admin"
     prefix_admin: str = "/admin"
+
+
+class CsrfConfig(BaseModel):
+    secret_key: str
+    token_name: str = "csrf_token"
 
 
 class DatabaseConfig(BaseModel):
@@ -93,6 +97,7 @@ class Settings(BaseSettings):
     access_token: AccessTokenConfig
     views: ViewsPrefix = ViewsPrefix()
     mail: MailConfig
+    csrf: CsrfConfig
 
 
 settings = Settings()

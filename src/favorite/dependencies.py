@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
 from fastapi import HTTPException, Depends, status
 from sqlalchemy.orm import selectinload
 
@@ -17,6 +17,27 @@ async def get_user_favorites(user: User, session: AsyncSession):
     )
     result = await session.scalars(stmt)
     return result.all()
+
+
+async def get_all_favorites_with_pagination(
+    user: User, session: AsyncSession, page: int = 1, limit: int = 9
+):
+    offset = (page - 1) * limit
+    stmt = (
+        select(Favorite)
+        .where(Favorite.user_id == user.id)
+        .options(selectinload(Favorite.question).selectinload(Question.category))
+        .offset(offset)
+        .limit(limit)
+    )
+    result = await session.scalars(stmt)
+    return result.all()
+
+
+async def get_total_favorites_count(user: User, session: AsyncSession):
+    stmt = select(func.count(Favorite.id)).where(Favorite.user_id == user.id)
+    result = await session.execute(stmt)
+    return result.scalar()
 
 
 async def add_favorite(favorite_in: FavoriteCreate, user: User, session: AsyncSession):

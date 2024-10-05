@@ -19,7 +19,7 @@
     {% endif %}
     <!-- Форма для редактирования профиля -->
     <form method="POST" action="/profile/edit" class="mx-auto" style="max-width: 600px;">
-        <!-- CSRF-токен, если у вас есть защита от CSRF -->
+        <!-- CSRF-токен -->
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
         <!-- Поле для изменения имени пользователя -->

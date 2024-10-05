@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container">
     <h1 class="text-center my-4">Вопрос: {{ question.title }}</h1>
-    <p>Категория: <a href="/view/categories/{{ question.category.id }}" class="text-decoration-none">{{ question.category.name }}</a></p>
+    <p>Категория: <a href="/categories/{{ question.category.id }}" class="text-decoration-none">{{ question.category.name }}</a></p>
     {% if error %}
     <div class="alert alert-danger">{{ error }}</div>
     {% endif %}

@@ -1,14 +1,29 @@
 from typing import Annotated, List, Sequence
 
-from fastapi import APIRouter, Depends, Request, status, Form, HTTPException, Path
+from fastapi import (
+    APIRouter,
+    Depends,
+    Request,
+    status,
+    Form,
+    HTTPException,
+    Path,
+    Query,
+)
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi_users.exceptions import (
     InvalidPasswordException,
     UserNotExists,
 )
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.favorite.dependencies import (
+    get_all_favorites_with_pagination,
+    get_total_favorites_count,
+)
+from src.common.schemas import PaginationQuery
 
 from src.auth.dependencies import get_user_manager, get_user_by_username
 from src.auth.manager import UserManager
@@ -20,9 +35,8 @@ from src.config import settings
 from src.auth.fastapi_users import current_active_user_ui
 from src.auth.models import User
 from src.db.database import db_helper
-from src.favorite.dependencies import get_user_favorites, remove_favorite
-from starlette.responses import RedirectResponse
-from src.utils.utils import get_hashed_password, verify_password
+from src.favorite.dependencies import remove_favorite
+from src.utils.utils import verify_password
 
 templates = Jinja2Templates(directory="templates")
 
@@ -35,11 +49,34 @@ async def profile(
     user: Annotated[User, Depends(current_active_user_ui)],
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     categories: Sequence[Category] = Depends(get_categories),
+    page: str | None = Query(None),
+    page_size: str | None = Query(None),
 ):
     if user is None:
-        return RedirectResponse(url="/auth/login", status_code=status.HTTP_302_FOUND)
+        return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
 
-    favorites = await get_user_favorites(user=user, session=session)
+    query_params: PaginationQuery = PaginationQuery()
+    try:
+        query_params = PaginationQuery(
+            page=page,
+            page_size=page_size,
+        )
+    except ValidationError:
+        query_params.page = 1
+        query_params.page_size = 9
+
+    # favorites = await get_user_favorites(user=user, session=session)
+    favorites = await get_all_favorites_with_pagination(
+        user=user,
+        session=session,
+        page=query_params.page,
+        limit=query_params.page_size,
+    )
+    total_favorites = await get_total_favorites_count(user=user, session=session)
+    total_pages_favorites = (
+        total_favorites + query_params.page_size - 1
+    ) // query_params.page_size
+
     return templates.TemplateResponse(
         "auth/profile.html",
         {
@@ -47,6 +84,9 @@ async def profile(
             "user": user,
             "categories": categories,
             "favorites": favorites,
+            "page": query_params.page,
+            "page_size": query_params.page_size,
+            "total_pages_favorites": total_pages_favorites,
         },
     )
 
@@ -58,7 +98,7 @@ async def edit_profile_form(
     categories: Sequence[Category] = Depends(get_categories),
 ):
     if user is None:
-        return RedirectResponse(url="/auth/login", status_code=status.HTTP_302_FOUND)
+        return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
 
     return templates.TemplateResponse(
         "auth/edit_profile.html",

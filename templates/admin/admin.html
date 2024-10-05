@@ -133,7 +133,7 @@
                                         <tr>
                                             <td>{{ item.category.name }}</td>
                                             <td>{{ item.title }}</td>
-                                            <td>{{ item.answer.content }}</td>
+                                            <td>{{ item.answer.content | safe }}</td>
                                             <td>
                                                 <a href="/admin/edit/{{ item.id }}" class="btn btn-warning btn-sm">Редактировать</a>
                                                 <a href="/admin/delete_question/{{ item.id }}" class="btn btn-danger btn-sm">Удалить</a>

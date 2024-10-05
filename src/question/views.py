@@ -73,7 +73,7 @@ async def add_to_favorites(
     question_id: int = Form(...),
 ):
     if user is None:
-        return RedirectResponse(url="/auth/login", status_code=status.HTTP_302_FOUND)
+        return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
     try:
         question = await get_question_by_id(question_id=question_id, session=session)
         question_slug = question.slug
@@ -82,11 +82,11 @@ async def add_to_favorites(
         )
         await add_favorite(favorite_in=favorite_in, user=user, session=session)
         return RedirectResponse(
-            url=f"/view/questions/{question.slug}?success=Добавлено в избранное",
+            url=f"/questions/{question.slug}?success=Добавлено в избранное",
             status_code=status.HTTP_302_FOUND,
         )
     except HTTPException:
         return RedirectResponse(
-            url=f"/view/questions/{question_slug}?error=Уже в избранном",
+            url=f"/questions/{question_slug}?error=Уже в избранном",
             status_code=status.HTTP_303_SEE_OTHER,
         )

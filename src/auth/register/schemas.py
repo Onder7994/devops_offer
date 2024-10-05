@@ -1,7 +1,29 @@
 import re
 
-from pydantic import EmailStr, BaseModel, model_validator, field_validator
+from pydantic import BaseModel, model_validator, field_validator
 from pydantic_core import PydanticCustomError
+
+
+def is_valid_password(password: str) -> bool:
+    """
+    Проверяет, соответствует ли пароль требованиям:
+    - Минимальная длина 8 символов.
+    - Содержит хотя бы одну заглавную букву.
+    - Содержит хотя бы одну строчную букву.
+    - Содержит хотя бы одну цифру.
+    - Содержит хотя бы один специальный символ.
+    """
+    if len(password) < 8:
+        return False
+    if not re.search(r"[A-Z]", password):
+        return False
+    if not re.search(r"[a-z]", password):
+        return False
+    if not re.search(r"\d", password):
+        return False
+    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
+        return False
+    return True
 
 
 class RegisterForm(BaseModel):
@@ -39,22 +61,22 @@ class RegisterForm(BaseModel):
     @field_validator("password")
     @classmethod
     def validate_password(cls, value):
-        if len(value) < 6:
+        if not is_valid_password(value):
             raise PydanticCustomError(
                 "password_validate_error",
-                "Пароль должен содержать не менее 6 символов",
+                "Пароль должен содержать не менее 8 символов, включая заглавные и строчные буквы, цифры и специальные символы.",
             )
         return value
 
-    @field_validator("password_confirm")
-    @classmethod
-    def validate_password_confirm(cls, value):
-        if len(value) < 6:
-            raise PydanticCustomError(
-                "password_validate_error",
-                "Пароль должен содержать не менее 6 символов",
-            )
-        return value
+    # @field_validator("password_confirm")
+    # @classmethod
+    # def validate_password_confirm(cls, value):
+    #    if not is_valid_password(value):
+    #        raise PydanticCustomError(
+    #            "password_validate_error",
+    #            "Пароль должен содержать не менее 8 символов, включая заглавные и строчные буквы, цифры и специальные символы.",
+    #        )
+    #    return value
 
     @model_validator(mode="after")
     @classmethod
