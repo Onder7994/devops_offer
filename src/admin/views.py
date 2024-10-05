@@ -181,7 +181,8 @@ async def delete_question(
         return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
     try:
         await delete_question_by_id(question_id=question_id, session=session)
-    except HTTPException:
+    except HTTPException as err:
+        print(err)
         return RedirectResponse(url="/admin", status_code=status.HTTP_303_SEE_OTHER)
     return RedirectResponse(url="/admin", status_code=status.HTTP_302_FOUND)
 

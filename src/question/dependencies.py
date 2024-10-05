@@ -153,7 +153,7 @@ async def delete_question_by_id(
         )
     stmt = select(Favorite).where(Favorite.question_id == question_id)
     is_depends_on_favorites = await session.scalars(stmt)
-    if is_depends_on_favorites:
+    if is_depends_on_favorites.all():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Question depends on favorites",
