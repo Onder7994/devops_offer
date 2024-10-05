@@ -1,7 +1,7 @@
 from typing import Sequence, List
 
 from slugify import slugify
-from sqlalchemy import select, func
+from sqlalchemy import select, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -103,6 +103,7 @@ async def get_questions_by_category_id(
     stmt = (
         select(Question)
         .where(Question.category_id == category_id)
+        .order_by(desc(Question.id))
         .offset(offset)
         .limit(limit)
     )
