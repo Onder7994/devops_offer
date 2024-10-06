@@ -1,12 +1,19 @@
 from typing import Annotated, Sequence
 
 from fastapi.exceptions import HTTPException
-from fastapi import APIRouter, Request, Depends, status, Form, Query
+from fastapi import APIRouter, Request, Depends, status, Form, Query, Path
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import RedirectResponse
+
+from src.answer.schemas import AnswerUpdate
+from src.question.schemas import QuestionUpdate
+from src.question.dependencies import get_question_by_id, update_question
+from src.category.dependencies import update_category, get_category_by_slug
+from src.category.schemas import CategoryUpdate
+from src.category.dependencies import get_category_by_id
 from src.category.dependencies import (
     get_all_category_with_pagination,
     get_total_category_count,
@@ -21,7 +28,7 @@ from src.question.models import Question
 from src.question.schemas import QuestionCreate
 from src.question.dependencies import create_question, delete_question_by_id
 from src.answer.schemas import AnswerCreate
-from src.answer.dependencies import create_answer
+from src.answer.dependencies import create_answer, update_answer
 from src.category.schemas import CategoryCreate
 from src.db.database import db_helper
 from src.auth.models import User
@@ -171,7 +178,7 @@ async def admin_add_question_answer(
     )
 
 
-@router.get("/delete_question/{question_id}")
+@router.get("/delete/question/{question_id}")
 async def delete_question(
     question_id: int,
     superuser: Annotated[User, Depends(current_active_superuser_ui)],
@@ -187,7 +194,7 @@ async def delete_question(
     return RedirectResponse(url="/admin", status_code=status.HTTP_302_FOUND)
 
 
-@router.get("/delete_category/{category_id}")
+@router.get("/delete/category/{category_id}")
 async def delete_category(
     category_id: int,
     superuser: Annotated[User, Depends(current_active_superuser_ui)],
@@ -200,3 +207,127 @@ async def delete_category(
     except HTTPException:
         return RedirectResponse(url="/admin", status_code=status.HTTP_303_SEE_OTHER)
     return RedirectResponse(url="/admin", status_code=status.HTTP_302_FOUND)
+
+
+@router.get("/edit/category/{category_id}", response_class=HTMLResponse)
+async def edite_category(
+    request: Request,
+    category_id: int,
+    superuser: Annotated[User, Depends(current_active_superuser_ui)],
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    categories: Sequence[Category] = Depends(get_categories),
+):
+    if superuser is None:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    category = await get_category_by_id(category_id=category_id, session=session)
+    return templates.TemplateResponse(
+        "admin/edit_category.html",
+        {
+            "request": request,
+            "user": superuser,
+            "categories": categories,
+            "category": category,
+        },
+    )
+
+
+@router.post("/update/category/{category_id}")
+async def update_category_view(
+    superuser: Annotated[User, Depends(current_active_superuser_ui)],
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    category_name: str = Form(...),
+    category_id: int = Path(...),
+):
+    if superuser is None:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    if category_name:
+        category_in = CategoryUpdate(
+            name=category_name,
+        )
+        try:
+            await update_category(
+                category_id=category_id, category_in=category_in, session=session
+            )
+            return RedirectResponse(
+                url=f"/admin?section=categories&success_category=1",
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
+        except HTTPException:
+            return RedirectResponse(
+                url=f"/admin?section=categories&category_error=Ошибка обновления",
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
+
+
+@router.get("/edit/question/{question_id}", response_class=HTMLResponse)
+async def edit_question(
+    request: Request,
+    question_id: int,
+    superuser: Annotated[User, Depends(current_active_superuser_ui)],
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    categories: Sequence[Category] = Depends(get_categories),
+):
+    if superuser is None:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    question = await get_question_by_id(question_id=question_id, session=session)
+    return templates.TemplateResponse(
+        "admin/edit_question.html",
+        {
+            "request": request,
+            "user": superuser,
+            "categories": categories,
+            "question": question,
+        },
+    )
+
+
+@router.post("/update/question/{question_id}", response_class=RedirectResponse)
+async def update_question_view(
+    superuser: Annotated[User, Depends(current_active_superuser_ui)],
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    question_id: int = Path(...),
+    question: str = Form(...),
+    answer: str = Form(...),
+):
+    if superuser is None:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    if question:
+        question_in = QuestionUpdate(
+            title=question,
+        )
+        try:
+            await update_question(
+                question_id=question_id,
+                question_in=question_in,
+                session=session,
+            )
+
+        except HTTPException:
+            return RedirectResponse(
+                url=f"/admin?section=questions&question_answer_error=Ошибка обновления",
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
+    if answer:
+        answer_in = AnswerUpdate(
+            content=answer,
+            question_id=question_id,
+        )
+        try:
+            response = await get_question_by_id(
+                question_id=question_id, session=session
+            )
+            await update_answer(
+                answer_id=response.answer.id,
+                answer_in=answer_in,
+                session=session,
+            )
+        except HTTPException:
+            return RedirectResponse(
+                url=f"/admin?section=questions&question_answer_error=Ошибка обновления",
+                status_code=status.HTTP_303_SEE_OTHER,
+            )
+
+    return RedirectResponse(
+        url=f"/admin?section=questions&success_question_answer=1",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )

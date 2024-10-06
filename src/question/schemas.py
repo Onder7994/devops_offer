@@ -13,9 +13,10 @@ class QuestionCreate(QuestionBase):
     pass
 
 
-class QuestionUpdate(QuestionBase):
+class QuestionUpdate(BaseModel):
     title: str | None = None
-    category_id: int
+    slug: str | None = None
+    # category_id: int
 
 
 class QuestionReadBase(QuestionBase):

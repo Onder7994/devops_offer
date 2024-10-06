@@ -62,8 +62,8 @@
                                             <td>{{ category.name }}</td>
                                             <td>{{ category.description }}</td>
                                             <td>
-                                                <a href="/admin/edit/{{ category.id }}" class="btn btn-warning btn-sm">Редактировать</a>
-                                                <a href="/admin/delete_category/{{ category.id }}" class="btn btn-danger btn-sm">Удалить</a>
+                                                <a href="/admin/edit/category/{{ category.id }}" class="btn btn-warning btn-sm">Редактировать</a>
+                                                <a href="/admin/delete/category/{{ category.id }}" class="btn btn-danger btn-sm">Удалить</a>
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -135,8 +135,8 @@
                                             <td>{{ item.title }}</td>
                                             <td>{{ item.answer.content | safe }}</td>
                                             <td>
-                                                <a href="/admin/edit/{{ item.id }}" class="btn btn-warning btn-sm">Редактировать</a>
-                                                <a href="/admin/delete_question/{{ item.id }}" class="btn btn-danger btn-sm">Удалить</a>
+                                                <a href="/admin/edit/question/{{ item.id }}" class="btn btn-warning btn-sm">Редактировать</a>
+                                                <a href="/admin/delete/question/{{ item.id }}" class="btn btn-danger btn-sm">Удалить</a>
                                             </td>
                                         </tr>
                                     {% endfor %}

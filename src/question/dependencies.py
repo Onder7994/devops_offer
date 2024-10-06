@@ -127,6 +127,8 @@ async def update_question(
     question_id: int, question_in: QuestionUpdate, session: AsyncSession
 ) -> Question:
     question = await get_question_by_id(question_id=question_id, session=session)
+    slug = slugify(question_in.title)
+    question_in.slug = slug
     for field, value in question_in.model_dump(exclude_unset=True).items():
         setattr(question, field, value)
     session.add(question)

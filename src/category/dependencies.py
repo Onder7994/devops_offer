@@ -86,6 +86,14 @@ async def update_category(
     category_id: int, category_in: CategoryUpdate, session: AsyncSession
 ) -> Category:
     category = await get_category_by_id(category_id=category_id, session=session)
+    slug = slugify(category_in.name)
+    is_category_exist = await get_category_by_slug(slug=slug, session=session)
+    if is_category_exist:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Category already exist",
+        )
+    category_in.slug = slug
     for field, value in category_in.model_dump(exclude_unset=True).items():
         setattr(category, field, value)
     session.add(category)

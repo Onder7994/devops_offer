@@ -13,6 +13,7 @@ class CategoryCreate(CategoryBase):
 class CategoryUpdate(CategoryBase):
     name: str | None = None
     description: str | None = None
+    slug: str | None = None
 
 
 class CategoryRead(CategoryBase):
