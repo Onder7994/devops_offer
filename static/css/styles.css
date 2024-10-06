@@ -1,6 +1,11 @@
+html, body {
+    height: 100%;
+}
 body {
     font-family: 'Roboto', sans-serif;
     background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
 }
 
 .navbar-brand {
@@ -22,8 +27,19 @@ body {
 
 .container {
     padding-top: 20px;
+    flex: 1
 }
 
+footer {
+    margin-top: auto; /* Футер всегда остается внизу */
+}
+
+footer a {
+   text-decoration: none; /* Убирает подчеркивание для ссылок */
+}
+footer a:hover {
+   text-decoration: underline; /* Опционально: добавляет подчеркивание при наведении */
+}
 .card {
     border-radius: 8px;
     margin-bottom: 20px;
