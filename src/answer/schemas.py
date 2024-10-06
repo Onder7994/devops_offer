@@ -1,4 +1,5 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator, field_serializer
+from bs4 import BeautifulSoup
 
 
 class AnswerBase(BaseModel):
@@ -19,12 +20,24 @@ class AnswerReadBase(AnswerBase):
     id: int
     model_config = ConfigDict(from_attributes=True)
 
+
 class AnswerReadNested(AnswerReadBase):
-    pass
+    @field_serializer("content")
+    def strip_html(self, v):
+        soup = BeautifulSoup(v, "html.parser")
+        return soup.get_text()
+
 
 class AnswerRead(AnswerReadBase):
     question: "QuestionReadNested"
     model_config = ConfigDict(from_attributes=True)
 
+    @field_serializer("content")
+    def strip_html(self, v):
+        soup = BeautifulSoup(v, "html.parser")
+        return soup.get_text()
+
+
 from src.question.schemas import QuestionReadNested
+
 AnswerRead.model_rebuild()
