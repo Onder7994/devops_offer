@@ -1,6 +1,7 @@
 html, body {
     height: 100%;
 }
+
 body {
     font-family: 'Roboto', sans-serif;
     background-color: #f8f9fa;
@@ -27,7 +28,7 @@ body {
 
 .container {
     padding-top: 20px;
-    flex: 1
+    flex: 1;
 }
 
 footer {
@@ -37,14 +38,25 @@ footer {
 footer a {
    text-decoration: none; /* Убирает подчеркивание для ссылок */
 }
+
 footer a:hover {
    text-decoration: underline; /* Опционально: добавляет подчеркивание при наведении */
 }
+
 .card {
     border-radius: 8px;
     margin-bottom: 20px;
     border: 1px solid #e0e0e0;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    font-size: 1.25rem;
 }
 
 .card h2 {
@@ -60,15 +72,6 @@ footer a:hover {
 .form-control:focus {
     box-shadow: none;
     border-color: #80bdff;
-}
-
-.card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.card-title {
-    font-size: 1.25rem;
 }
 
 .btn-primary {
@@ -109,7 +112,6 @@ footer a:hover {
     margin-right: auto;
 }
 
-
 .list-group-item.active,
 .list-group-item.active:focus,
 .list-group-item.active:hover {
@@ -118,5 +120,50 @@ footer a:hover {
     border-color: #007bff !important;
 }
 
+/* Новый стиль для баннера категории */
+.category-banner {
+    border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    text-align: center;
+    color: white;
+}
 
+/* Дополнительные стили для карточек */
+.card {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
 
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Стили для кнопок */
+.btn-primary {
+    background-color: #2575fc;
+    border-color: #2575fc;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #6a11cb;
+    border-color: #6a11cb;
+    transform: translateY(-3px);
+}
+
+/* Стили для иконок и текста в карточках */
+.card-text {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.bi-tag {
+    margin-right: 5px;
+    color: #007bff;
+}
+
+/* Плавное увеличение карточек при наведении */
+.card:hover {
+    transform: scale(1.02);
+}

@@ -1,20 +1,27 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-<div class="container">
-    <h1 class="text-center my-4">Вопрос: {{ question.title }}</h1>
-    <p>Категория: <a href="/categories/{{ question.category.id }}" class="text-decoration-none">{{ question.category.name }}</a></p>
+<div class="container mt-5">
+    <!-- Заголовок вопроса -->
+    <div class="text-center mb-5">
+        <h1 class="display-4">{{ question.title }}</h1>
+        <p class="lead">Категория: <a href="/categories/{{ question.category.slug }}" class="text-decoration-none">{{ question.category.name }}</a></p>
+    </div>
+
+    <!-- Сообщения об ошибке или успехе -->
     {% if error %}
     <div class="alert alert-danger">{{ error }}</div>
     {% endif %}
     {% if success %}
     <div class="alert alert-success notification-box">{{ success }}</div>
     {% endif %}
+
+    <!-- Ответ на вопрос -->
     {% if question.answer %}
-        <div class="card my-4">
+        <div class="card shadow-sm my-5">
             <div class="card-body">
-                <h2 class="card-title">Ответ:</h2>
-                <p class="card-text">{{ question.answer.content | safe }}</p>
+                <h2 class="card-title text-primary"><i class="bi bi-lightbulb"></i> Ответ:</h2>
+                <p class="card-text fs-5">{{ question.answer.content | safe }}</p>
             </div>
         </div>
     {% else %}
@@ -22,9 +29,11 @@
             Ответ еще не добавлен.
         </div>
     {% endif %}
-    <form method="post" action="{{ url_for('add_to_favorites') }}">
+
+    <!-- Кнопка "В избранное" -->
+    <form method="post" action="{{ url_for('add_to_favorites') }}" class="text-center mt-4">
         <input type="hidden" name="question_id" value="{{ question.id }}">
-        <button type="submit" class="btn btn-outline-warning" {% if question.id in favorite_question_ids %}disabled{% endif %}>
+        <button type="submit" class="btn btn-outline-warning btn-lg" {% if question.id in favorite_question_ids %}disabled{% endif %}>
             <i class="fa fa-star"></i>
             {% if question.id in favorite_question_ids %}
             В избранном
@@ -34,5 +43,67 @@
         </button>
     </form>
 </div>
-{% endblock %}
 
+<style>
+    /* Стиль для заголовка */
+    .display-4 {
+        font-weight: bold;
+        color: #343a40;
+    }
+
+    .lead a {
+        color: #0d6efd;
+        text-decoration: none;
+    }
+
+    .lead a:hover {
+        text-decoration: underline;
+    }
+
+    /* Стиль для карточки ответа */
+    .card {
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-title {
+        font-size: 1.75rem;
+    }
+
+    /* Кнопка "В избранное" */
+    .btn-outline-warning {
+        font-size: 1.25rem;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .btn-outline-warning:hover {
+        background-color: #ffc107;
+        color: white;
+    }
+
+    /* Уведомления */
+    .alert-success, .alert-danger {
+        border-radius: 6px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        font-size: 1.1rem;
+    }
+
+    .alert-warning {
+        border-radius: 6px;
+        font-size: 1.1rem;
+    }
+
+    /* Иконки */
+    .bi-lightbulb {
+        margin-right: 8px;
+        color: #0d6efd;
+    }
+
+    /* Текст ответа */
+    .card-text {
+        font-size: 1.2rem;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}
