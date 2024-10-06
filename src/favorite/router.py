@@ -14,7 +14,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=List[FavoriteRead])
+@router.get("", response_model=List[FavoriteRead])
 async def get_favorites(
     user: Annotated[User, Depends(current_active_user)],
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
@@ -23,7 +23,7 @@ async def get_favorites(
     return favorites
 
 
-@router.post("/", response_model=FavoriteRead)
+@router.post("", response_model=FavoriteRead)
 async def create_favorite(
     favorite_in: FavoriteCreate,
     user: Annotated[User, Depends(current_active_user)],

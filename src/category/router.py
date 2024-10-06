@@ -22,7 +22,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[CategoryRead])
+@router.get("", response_model=list[CategoryRead])
 async def get_categories(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
 ):
@@ -39,7 +39,7 @@ async def get_category(
     return category
 
 
-@router.post("/", response_model=CategoryRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=CategoryRead, status_code=status.HTTP_201_CREATED)
 async def create_new_category(
     category_in: CategoryCreate,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
