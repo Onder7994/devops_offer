@@ -21,7 +21,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     async def on_after_forgot_password(
         self, user: models.UP, token: str, request: Optional[Request] = None
     ) -> None:
-        reset_url = f"{request.url.scheme}://{request.url.hostname}/auth/password-reset-confirm?token={token}"
+        reset_url = f"{request.url.scheme}://{request.url.hostname}/password-reset-confirm?token={token}"
         message = MessageSchema(
             subject="Сброс пароля",
             recipients=[user.email],

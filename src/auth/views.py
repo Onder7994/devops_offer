@@ -71,6 +71,7 @@ async def password_reset(
 
     except ValidationError as err:
         errors_messages = [err["msg"] for err in err.errors()]
+        print(errors_messages)
         return templates.TemplateResponse(
             "auth/password_reset.html",
             {

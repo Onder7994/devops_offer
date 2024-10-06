@@ -29,3 +29,4 @@ class ResetPasswordForm(BaseModel):
                 "email_validate_error",
                 "Некорректный формат email адреса",
             )
+        return value

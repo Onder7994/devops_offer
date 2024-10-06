@@ -76,12 +76,12 @@ class MailConfig(BaseModel):
     password: str
     from_mail: str
     port: int = 587
-    server: str = "smtp.gmail.com"
+    server: str = "smtp.yandex.ru"
     tls: bool = True
     ssl: bool = False
     use_credentials: bool = True
     validate_certs: bool = True
-    from_mail_name: str = "devops_offer"
+    from_mail_name: str = "devopsoffer"
 
 
 class Settings(BaseSettings):
