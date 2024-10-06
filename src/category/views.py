@@ -49,7 +49,7 @@ async def view_single_category(
     category = await get_category_by_slug(slug=slug, session=session)
     if category is None:
         return templates.TemplateResponse(
-            "404.html",
+            "errors/404.html",
             {
                 "request": request,
                 "message": "Категория не найдена",

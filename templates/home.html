@@ -1,6 +1,55 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-<h1>Добро пожаловать в Мой API</h1>
-<p>Здесь вы можете изучить различные категории и вопросы.</p>
+<div class="container mt-5">
+    <!-- Приветственное сообщение -->
+    <div class="text-center mb-5">
+        <h1 class="display-4">Добро пожаловать на DevOps offer!</h1>
+        <p class="lead">Готовьтесь к собеседованиям, изучая реальные вопросы, которые часто задают на интервью!</p>
+        {% if not user %}
+            <a href="/register" class="btn btn-primary btn-lg mx-2">Регистрация</a>
+            <a href="/login" class="btn btn-outline-secondary btn-lg mx-2">Войти</a>
+        {% endif %}
+    </div>
+
+    <!-- Категории вопросов -->
+    <div class="row">
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Linux</h5>
+                    <p class="card-text">Изучите ключевые вопросы работы Linux систем, которые часто задаются на собеседованиях.</p>
+                    <a href="/categories/linux" class="btn btn-outline-primary">Перейти к вопросам</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">CI/CD</h5>
+                    <p class="card-text">Наиболее актуальные вопросы по CI/CD.</p>
+                    <a href="/categories/ci-cd" class="btn btn-outline-primary">Перейти к вопросам</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Kubernetes</h5>
+                    <p class="card-text">Узнайте, что может ожидать вас на собеседовании по kubernetes.</p>
+                    <a href="/categories/k8s" class="btn btn-outline-primary">Перейти к вопросам</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Дополнительная информация для зарегистрированных пользователей -->
+    {% if user %}
+    <div class="alert alert-info mt-5">
+        <h4 class="alert-heading">Добро пожаловать, {{ user.username }}!</h4>
+        <p>Вы можете сохранять вопросы в избранное, чтобы позже вернуться к ним на своей странице профиля.</p>
+        <a href="/profile" class="btn btn-outline-primary">Перейти в профиль</a>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}
