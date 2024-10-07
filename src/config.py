@@ -1,7 +1,7 @@
 from typing import Literal
 
 from pydantic import BaseModel
-from pydantic import PostgresDsn
+from pydantic import PostgresDsn, RedisDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -47,6 +47,7 @@ class DatabaseConfig(BaseModel):
     echo_pool: bool = False
     pool_size: int = 50
     max_overflow: int = 10
+    pool_timeout: int = 60
 
     naming_convention: dict[str, str] = {
         "ix": "ix_%(column_0_label)s",
@@ -55,6 +56,10 @@ class DatabaseConfig(BaseModel):
         "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
         "pk": "pk_%(table_name)s",
     }
+
+
+class RedisConfig(BaseModel):
+    url: RedisDsn
 
 
 class AccessTokenConfig(BaseModel):
@@ -100,6 +105,7 @@ class Settings(BaseSettings):
     views: ViewsPrefix = ViewsPrefix()
     mail: MailConfig
     csrf: CsrfConfig
+    redis: RedisConfig
 
 
 settings = Settings()

@@ -14,6 +14,7 @@ from src.db.database import db_helper
 from .schemas import QuestionUpdate, QuestionRead, QuestionCreate
 from src.config import settings
 from src.auth.fastapi_users import current_active_superuser
+from fastapi_cache.decorator import cache
 
 router = APIRouter(
     prefix=settings.api.prefix_question,
@@ -22,6 +23,7 @@ router = APIRouter(
 
 
 @router.get("", response_model=list[QuestionRead])
+# @cache(expire=30)
 async def get_questions(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
 ):

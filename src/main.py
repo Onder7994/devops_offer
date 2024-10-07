@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from typing import Annotated, Sequence
+from typing import Annotated, Sequence, AsyncIterator
 
 from fastapi import FastAPI, Request, Depends, status
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -29,6 +29,9 @@ from src.config import settings
 from src.db.database import db_helper
 from src.common.dependencies import get_categories
 import logging
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from redis import asyncio as aioredis
 
 logging.basicConfig(format=settings.logging.log_format)
 
@@ -45,8 +48,10 @@ else:
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # start
+    redis = aioredis.from_url(str(settings.redis.url))
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     yield
     # shutdown
     await db_helper.dispose()

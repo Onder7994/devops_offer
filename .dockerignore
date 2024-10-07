@@ -1,0 +1,8 @@
+.gitignore
+.git
+.idea
+**/__pycache__/
+docker-compose.yml
+README.md
+run.sh
+Dockerfile
