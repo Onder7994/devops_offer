@@ -133,10 +133,26 @@ async def home(
     )
 
 
+@front_app.get("/api_doc", response_class=HTMLResponse)
+async def api_doc(
+    request: Request,
+    categories: Annotated[Sequence[Category], Depends(get_categories)],
+    user: Annotated[User, Depends(current_active_user_ui)] = None,
+):
+    return templates.TemplateResponse(
+        "api_doc.html",
+        {
+            "request": request,
+            "categories": categories,
+            "user": user,
+        },
+    )
+
+
 if __name__ == "__main__":
     uvicorn.run(
         "src.main:app",
         host=settings.run.host,
         port=settings.run.port,
-        reload=True,
+        workers=settings.run.workers,
     )

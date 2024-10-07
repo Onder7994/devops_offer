@@ -25,6 +25,7 @@ python-slugify = "^8.0.4"
 fastapi-mail = "^1.4.1"
 itsdangerous = "^2.2.0"
 beautifulsoup4 = "^4.12.3"
+gunicorn = "^23.0.0"
 
 
 [tool.poetry.group.dev.dependencies]

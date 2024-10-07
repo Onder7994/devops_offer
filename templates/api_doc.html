@@ -1,0 +1,253 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-5">API Документация</h1>
+
+    <!-- Логин -->
+    <section class="mb-5">
+        <h2>Логин</h2>
+        <p>Этот API используется для авторизации пользователя и получения токена доступа.</p>
+
+        <h3>Запрос</h3>
+        <pre><code class="bash">
+curl -X 'POST' \
+  'http://0.0.0.0:8085/api/auth/jwt/login' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'grant_type=password&username=test%40test.com&password=123456&scope=&client_id=string&client_secret=string'
+        </code></pre>
+
+        <h3>Пример ответа</h3>
+        <pre><code class="json">
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiYXVkIjpbImZhc3RhcGktdXNlcnM6YXV0aCJdLCJleHAiOjE3MjgzMDI5MTV9.tuiRLV8n3EHYLJpuuyIwuYxQVxkEBl_cIHSpkrVkU_Q",
+  "token_type": "bearer"
+}
+        </code></pre>
+    </section>
+
+    <!-- Регистрация -->
+    <section class="mb-5">
+        <h2>Регистрация</h2>
+        <p>Этот API используется для регистрации нового пользователя.</p>
+
+        <h3>Запрос</h3>
+        <pre><code class="bash">
+curl -X 'POST' \
+  'http://0.0.0.0:8085/api/auth/register' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "email": "user@example.com",
+  "password": "string",
+  "is_active": true,
+  "username": "string"
+}'
+        </code></pre>
+
+        <h3>Пример ответа</h3>
+        <pre><code class="json">
+{
+  "id": 4,
+  "email": "user@example.com",
+  "is_active": true,
+  "is_superuser": false,
+  "is_verified": false,
+  "username": "string"
+}
+        </code></pre>
+    </section>
+
+    <!-- Получение категорий -->
+    <section class="mb-5">
+        <h2>Получение категорий</h2>
+        <p>Этот API используется для получения списка всех категорий.</p>
+
+        <h3>Запрос</h3>
+        <pre><code class="bash">
+curl -X 'GET' \
+  'http://0.0.0.0:8085/api/categories' \
+  -H 'accept: application/json'
+        </code></pre>
+
+        <h3>Пример ответа</h3>
+        <pre><code class="json">
+[
+  {
+    "name": "string",
+    "description": "string",
+    "id": 0,
+    "slug": "string"
+  }
+]
+        </code></pre>
+    </section>
+
+    <!-- Получение конкретной категории -->
+    <section class="mb-5">
+        <h2>Получение конкретной категории</h2>
+        <p>Этот API используется для получения информации о конкретной категории по её ID.</p>
+
+        <h3>Запрос</h3>
+        <pre><code class="bash">
+curl -X 'GET' \
+  'http://0.0.0.0:8085/api/categories/1' \
+  -H 'accept: application/json'
+        </code></pre>
+
+        <h3>Пример ответа</h3>
+        <pre><code class="json">
+{
+  "name": "string",
+  "description": "string",
+  "id": 0,
+  "slug": "string"
+}
+        </code></pre>
+    </section>
+
+    <!-- Получение списка вопросов -->
+    <section class="mb-5">
+        <h2>Получение списка вопросов</h2>
+        <p>Этот API используется для получения списка всех вопросов.</p>
+
+        <h3>Запрос</h3>
+        <pre><code class="bash">
+curl -X 'GET' \
+  'http://0.0.0.0:8085/api/questions' \
+  -H 'accept: application/json'
+        </code></pre>
+
+        <h3>Пример ответа</h3>
+        <pre><code class="json">
+[
+  {
+    "title": "string",
+    "category_id": 0,
+    "id": 0,
+    "category": {
+      "name": "string",
+      "description": "string",
+      "id": 0,
+      "slug": "string"
+    },
+    "answer": {
+      "content": "string",
+      "question_id": 0,
+      "id": 0
+    }
+  }
+]
+        </code></pre>
+    </section>
+
+    <!-- Получение конкретного вопроса -->
+    <section class="mb-5">
+        <h2>Получение конкретного вопроса</h2>
+        <p>Этот API используется для получения информации о конкретном вопросе по его ID.</p>
+
+        <h3>Запрос</h3>
+        <pre><code class="bash">
+curl -X 'GET' \
+  'http://0.0.0.0:8085/api/questions/1' \
+  -H 'accept: application/json'
+        </code></pre>
+
+        <h3>Пример ответа</h3>
+        <pre><code class="json">
+{
+  "title": "string",
+  "category_id": 0,
+  "id": 0,
+  "category": {
+    "name": "string",
+    "description": "string",
+    "id": 0,
+    "slug": "string"
+  },
+  "answer": {
+    "content": "string",
+    "question_id": 0,
+    "id": 0
+  }
+}
+        </code></pre>
+    </section>
+
+    <!-- Получение всех ответов -->
+    <section class="mb-5">
+        <h2>Получение всех ответов</h2>
+        <p>Этот API используется для получения списка всех ответов.</p>
+
+        <h3>Запрос</h3>
+        <pre><code class="bash">
+curl -X 'GET' \
+  'http://0.0.0.0:8085/api/answers' \
+  -H 'accept: application/json'
+        </code></pre>
+
+        <h3>Пример ответа</h3>
+        <pre><code class="json">
+[
+  {
+    "content": "string",
+    "question_id": 0,
+    "id": 0,
+    "question": {
+      "title": "string",
+      "category_id": 0,
+      "id": 0,
+      "category": {
+        "name": "string",
+        "description": "string",
+        "id": 0,
+        "slug": "string"
+      }
+    }
+  }
+]
+        </code></pre>
+    </section>
+
+    <!-- Получение конкретного ответа -->
+    <section class="mb-5">
+        <h2>Получение конкретного ответа</h2>
+        <p>Этот API используется для получения информации о конкретном ответе по его ID.</p>
+
+        <h3>Запрос</h3>
+        <pre><code class="bash">
+curl -X 'GET' \
+  'http://0.0.0.0:8085/api/answers/1' \
+  -H 'accept: application/json'
+        </code></pre>
+
+        <h3>Пример ответа</h3>
+        <pre><code class="json">
+{
+  "content": "string",
+  "question_id": 0,
+  "id": 0,
+  "question": {
+    "title": "string",
+    "category_id": 0,
+    "id": 0,
+    "category": {
+      "name": "string",
+      "description": "string",
+      "id": 0,
+      "slug": "string"
+    }
+  }
+}
+        </code></pre>
+    </section>
+</div>
+
+<!-- Подключение Highlight.js -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+<script>
+    hljs.highlightAll();
+</script>
+{% endblock %}
