@@ -15,6 +15,7 @@ class RunConfig(BaseModel):
     port: int = 8085
     title: str = "DevOps offer API"
     workers: int = 4
+    mode: str = "dev"
 
 
 class ApiPrefix(BaseModel):

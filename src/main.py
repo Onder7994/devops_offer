@@ -34,6 +34,15 @@ logging.basicConfig(format=settings.logging.log_format)
 
 templates = Jinja2Templates(directory="templates")
 
+if settings.run.mode == "prod":
+    docs_url = None
+    redoc_url = None
+    openapi_url = None
+else:
+    docs_url = "/docs"
+    redoc_url = "/redoc"
+    openapi_url = "/openapi.json"
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -56,6 +65,9 @@ api_app = FastAPI(
     lifespan=lifespan,
     title=settings.run.title,
     default_response_class=ORJSONResponse,
+    openapi_url=openapi_url,
+    docs_url=docs_url,
+    redoc_url=redoc_url,
 )
 
 front_app = FastAPI(

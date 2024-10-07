@@ -1,3 +1,3 @@
 #!/bin/bash
 
-gunicorn src.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8085
+docker run -d --network host -p 8085:8085 --env-file .env devops_offer
