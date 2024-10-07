@@ -1,7 +1,7 @@
 from typing import Sequence, List
 
 from slugify import slugify
-from sqlalchemy import select, func, desc
+from sqlalchemy import select, func, desc, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -107,14 +107,13 @@ async def get_questions_by_category_id(
     session: AsyncSession,
     offset: int = 0,
     limit: int = 9,
+    search: str | None = None,
 ) -> Sequence[Question]:
-    stmt = (
-        select(Question)
-        .where(Question.category_id == category_id)
-        .order_by(desc(Question.id))
-        .offset(offset)
-        .limit(limit)
-    )
+    stmt = select(Question).where(Question.category_id == category_id)
+    if search:
+        search_term = f"%{search}%"
+        stmt = stmt.where(Question.title.ilike(search_term))
+    stmt = stmt.order_by(desc(Question.id)).offset(offset).limit(limit)
     result = await session.scalars(stmt)
     return result.all()
 
@@ -122,12 +121,16 @@ async def get_questions_by_category_id(
 async def get_questions_count_by_category_id(
     category_id: int,
     session: AsyncSession,
+    search: str | None = None,
 ) -> int:
     stmt = (
         select(func.count())
         .select_from(Question)
         .where(Question.category_id == category_id)
     )
+    if search:
+        search_term = f"%{search}%"
+        stmt = stmt.where(Question.title.ilike(search_term))
     result = await session.execute(stmt)
     total = result.scalar_one()
     return total

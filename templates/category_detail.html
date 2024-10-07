@@ -8,9 +8,18 @@
         <p class="lead">Изучите вопросы и подготовьтесь к успешному собеседованию</p>
     </div>
 
+    <!-- Форма поиска -->
+    <form method="get" action="">
+        <div class="input-group mb-4">
+            <input type="text" class="form-control" name="search" placeholder="Поиск вопросов..." value="{{ search_query | default('') }}">
+            <button class="btn btn-primary" type="submit">Поиск</button>
+        </div>
+    </form>
+
     <h2 class="text-center mb-4">Вопросы</h2>
 
     <div class="row">
+        {% if questions %}
         {% for question in questions %}
         <div class="col-md-6 col-lg-4 mb-4">
             <div class="card h-100 shadow-sm border-0">
@@ -29,9 +38,13 @@
             </div>
         </div>
         {% endfor %}
+        {% else %}
+            <p class="text-center">Вопросы не найдены.</p>
+        {% endif %}
     </div>
-
+    {% if questions %}
     <!-- Пагинация -->
     {% include "layouts/pagination.html" %}
+    {% endif %}
 </div>
 {% endblock %}

@@ -7,6 +7,9 @@
       {% if section %}
         {% set query_params = query_params ~ '&section=' ~ section %}
       {% endif %}
+      {% if search_query %}
+        {% set query_params = query_params ~ '&search=' ~ search_query %}
+      {% endif %}
       <a class="page-link" href="?{{ query_params }}" aria-label="Previous">
         <span aria-hidden="true">&laquo;</span>
       </a>
@@ -23,6 +26,9 @@
       {% if section %}
         {% set query_params = query_params ~ '&section=' ~ section %}
       {% endif %}
+      {% if search_query %}
+        {% set query_params = query_params ~ '&search=' ~ search_query %}
+      {% endif %}
       <a class="page-link" href="?{{ query_params }}">{{ p }}</a>
     </li>
     {% endfor %}
@@ -32,6 +38,9 @@
       {% set query_params = 'page=' ~ (page + 1) ~ '&page_size=' ~ page_size %}
       {% if section %}
         {% set query_params = query_params ~ '&section=' ~ section %}
+      {% endif %}
+      {% if search_query %}
+        {% set query_params = query_params ~ '&search=' ~ search_query %}
       {% endif %}
       <a class="page-link" href="?{{ query_params }}" aria-label="Next">
         <span aria-hidden="true">&raquo;</span>

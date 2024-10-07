@@ -35,6 +35,7 @@ async def view_single_category(
     categories: Sequence[Category] = Depends(get_categories),
     page: str | None = Query(None),
     page_size: str | None = Query(None),
+    search: str | None = Query(""),
 ):
     query_params: PaginationQuery = PaginationQuery()
     try:
@@ -63,9 +64,12 @@ async def view_single_category(
         session=session,
         offset=offset,
         limit=query_params.page_size,
+        search=search,
     )
     total_questions = await get_questions_count_by_category_id(
-        category_id=category.id, session=session
+        category_id=category.id,
+        session=session,
+        search=search,
     )
     total_pages = ceil(total_questions / query_params.page_size)
     return templates.TemplateResponse(
@@ -79,5 +83,6 @@ async def view_single_category(
             "page": query_params.page,
             "page_size": query_params.page_size,
             "total_pages": total_pages,
+            "search_query": search,
         },
     )
