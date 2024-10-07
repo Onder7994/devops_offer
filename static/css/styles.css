@@ -167,3 +167,12 @@ footer a:hover {
 .card:hover {
     transform: scale(1.02);
 }
+
+.answer-cell {
+    max-width: 300px; /* Укажите ширину по вашему макету */
+    max-height: 100px; /* Высота ячейки, выше которой будет прокрутка */
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: normal;
+    overflow-y: auto; /* Вертикальная прокрутка */
+}

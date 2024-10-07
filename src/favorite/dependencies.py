@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select, func, desc
 from fastapi import HTTPException, Depends, status
 from sqlalchemy.orm import selectinload
 
@@ -27,6 +27,7 @@ async def get_all_favorites_with_pagination(
         select(Favorite)
         .where(Favorite.user_id == user.id)
         .options(selectinload(Favorite.question).selectinload(Question.category))
+        .order_by(desc(Favorite.id))
         .offset(offset)
         .limit(limit)
     )

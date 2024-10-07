@@ -49,12 +49,12 @@
                                 </li>
                             {% endfor %}
                         </ul>
-                    {% else %}
-                        <p class="text-muted">У вас пока нет избранных категорий.</p>
-                    {% endif %}
                     {% with page=page, page_size=page_size, total_pages=total_pages_favorites %}
                         {% include "layouts/pagination.html" %}
                     {% endwith %}
+                    {% else %}
+                        <p class="text-muted">У вас пока нет избранных категорий.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
