@@ -50,8 +50,10 @@ else:
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # start
-    redis = aioredis.from_url(str(settings.redis.url))
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    # redis = aioredis.from_url(
+    ##    str(settings.redis.url), encoding="utf8", decode_responses=True
+    # )
+    # FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     yield
     # shutdown
     await db_helper.dispose()
