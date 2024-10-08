@@ -31,6 +31,8 @@ from src.common.dependencies import get_categories
 import logging
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache.decorator import cache
+from src.common.dependencies import custom_cache_key_builder
 from redis import asyncio as aioredis
 
 logging.basicConfig(format=settings.logging.log_format)
@@ -50,10 +52,10 @@ else:
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # start
-    # redis = aioredis.from_url(
-    ##    str(settings.redis.url), encoding="utf8", decode_responses=True
-    # )
-    # FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+    redis = aioredis.from_url(
+        str(settings.redis.url), encoding="utf8", decode_responses=False
+    )
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     yield
     # shutdown
     await db_helper.dispose()

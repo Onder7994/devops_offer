@@ -60,6 +60,7 @@ class DatabaseConfig(BaseModel):
 
 class RedisConfig(BaseModel):
     url: RedisDsn
+    cache_ttl: int = 60
 
 
 class AccessTokenConfig(BaseModel):

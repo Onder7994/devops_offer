@@ -1,7 +1,10 @@
+import time
 from typing import Annotated
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from bs4 import BeautifulSoup
+
+from src.common.dependencies import custom_cache_key_builder
 from src.auth.models import User
 from .dependencies import (
     get_all_question,
@@ -23,7 +26,7 @@ router = APIRouter(
 
 
 @router.get("", response_model=list[QuestionRead])
-# @cache(expire=30)
+@cache(expire=settings.redis.cache_ttl, key_builder=custom_cache_key_builder)
 async def get_questions(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
 ):
@@ -32,6 +35,7 @@ async def get_questions(
 
 
 @router.get("/{question_id}", response_model=QuestionRead)
+@cache(expire=settings.redis.cache_ttl, key_builder=custom_cache_key_builder)
 async def get_question(
     question_id: int,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],

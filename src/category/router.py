@@ -15,6 +15,8 @@ from .schemas import CategoryRead, CategoryUpdate, CategoryCreate
 from src.config import settings
 from src.auth.models import User
 from src.auth.fastapi_users import current_active_superuser
+from src.common.dependencies import custom_cache_key_builder
+from fastapi_cache.decorator import cache
 
 router = APIRouter(
     prefix=settings.api.prefix_category,
@@ -23,6 +25,7 @@ router = APIRouter(
 
 
 @router.get("", response_model=list[CategoryRead])
+@cache(expire=settings.redis.cache_ttl, key_builder=custom_cache_key_builder)
 async def get_categories(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
 ):
@@ -31,6 +34,7 @@ async def get_categories(
 
 
 @router.get("/{category_id}", response_model=CategoryRead)
+@cache(expire=settings.redis.cache_ttl, key_builder=custom_cache_key_builder)
 async def get_category(
     category_id: int,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],

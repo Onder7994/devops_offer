@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
+from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .dependencies import (
@@ -14,6 +15,7 @@ from .schemas import AnswerRead, AnswerCreate, AnswerUpdate
 from src.config import settings
 from src.auth.fastapi_users import current_active_superuser
 from src.auth.models import User
+from src.common.dependencies import custom_cache_key_builder
 
 router = APIRouter(
     prefix=settings.api.prefix_answer,
@@ -22,6 +24,7 @@ router = APIRouter(
 
 
 @router.get("", response_model=list[AnswerRead])
+@cache(expire=settings.redis.cache_ttl, key_builder=custom_cache_key_builder)
 async def get_answers(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
 ):
@@ -30,6 +33,7 @@ async def get_answers(
 
 
 @router.get("/{answer_id}", response_model=AnswerRead)
+@cache(expire=settings.redis.cache_ttl, key_builder=custom_cache_key_builder)
 async def get_answer(
     answer_id: int,
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
