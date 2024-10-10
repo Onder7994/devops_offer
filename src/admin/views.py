@@ -60,7 +60,6 @@ async def admin_ui(
     success_question_answer: str = Query(None),
     question_answer_error: str = Query(None),
 ):
-
     if superuser is None:
         return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
 
