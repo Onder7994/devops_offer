@@ -82,6 +82,15 @@ async def get_question_by_slug(slug: str, session: AsyncSession) -> Question | N
     return question
 
 
+async def update_question_counter(slug: str, session: AsyncSession) -> None:
+    stmt = select(Question).where(Question.slug == slug)
+    result = await session.scalars(stmt)
+    question = result.first()
+    question.views += 1
+    await session.commit()
+    await session.refresh(question)
+
+
 async def create_question(
     question_in: QuestionCreate, session: AsyncSession
 ) -> Question:

@@ -1,3 +1,4 @@
+import json
 from typing import Annotated, Sequence
 from fastapi import APIRouter, Depends, Request, status, Form, Query, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,7 +8,7 @@ from src.favorite.dependencies import add_favorite, get_user_favorites
 from src.favorite.schemas import FavoriteCreate
 from src.question.dependencies import get_question_by_id
 from src.category.models import Category
-from src.question.dependencies import get_question_by_slug
+from src.question.dependencies import get_question_by_slug, update_question_counter
 from src.db.database import db_helper
 from src.config import settings
 from src.auth.models import User
@@ -52,6 +53,7 @@ async def view_single_question(
     if user:
         favorites = await get_user_favorites(user=user, session=session)
         favorite_question_ids = [favorite.question_id for favorite in favorites]
+    await update_question_counter(slug=slug, session=session)
     return templates.TemplateResponse(
         "question_detail.html",
         {

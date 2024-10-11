@@ -6,6 +6,9 @@
     <div class="text-center mb-5">
         <h1 class="display-4">{{ question.title }}</h1>
         <p class="lead">Категория: <a href="/categories/{{ question.category.slug }}" class="text-decoration-none">{{ question.category.name }}</a></p>
+        <p class="text-muted">
+            <i class="bi bi-eye"></i> Просмотров: {{ question.views }}
+        </p>
     </div>
 
     <!-- Сообщения об ошибке или успехе -->

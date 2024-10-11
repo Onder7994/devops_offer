@@ -13,6 +13,7 @@ class Question(Base):
     title: Mapped[str] = mapped_column(String(150), nullable=False)
     slug: Mapped[str] = mapped_column(String(150), unique=True, nullable=False)
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
+    views: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
     category: Mapped["Category"] = relationship("Category", back_populates="questions")
     answer: Mapped["Answer"] = relationship(

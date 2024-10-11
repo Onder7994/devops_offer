@@ -29,7 +29,9 @@
                     <p class="card-text text-muted mb-4">
                         <i class="bi bi-tag"></i> Категория: {{ category.name }}
                     </p>
-
+                    <p class="card-text text-muted mb-4">
+                        <i class="bi bi-eye"></i> Просмотров: {{ question.views }}
+                    </p>
                     <!-- Кнопка с эффектом при наведении -->
                     <a href="/questions/{{ question.slug }}" class="btn btn-primary mt-auto">
                         Подробнее
